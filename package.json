@@ -1,0 +1,22 @@
+{
+  "name": "petsmartest",
+  "version": "1.0.0",
+  "description": "SWE Spring 2024 project starring (Jeremy Brigham, Nicholas Kinnas, Khoi Tran, William Welden)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jbrigham-Trinity/PetSmartest.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jbrigham-Trinity/PetSmartest/issues"
+  },
+  "homepage": "https://github.com/Jbrigham-Trinity/PetSmartest#readme",
+  "dependencies": {
+    "express": "^4.18.3"
+  }
+}
