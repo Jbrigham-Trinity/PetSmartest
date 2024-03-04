@@ -5,6 +5,8 @@ const port = 3000;
 //running this makes us able to load express files as web pages
 app.set('view engine', 'ejs')
 
+app.use(express.static('assets'))
+
 //check it out its our homepage
 
 app.get("/", function (req, res) {
@@ -15,6 +17,9 @@ app.get("/", function (req, res) {
     res.render('home')
 });
 
+app.get("shopping", function(req, res) {
+    res.render("productPage.ejs")
+});
 app.get("/accounts", function (req, res) {
     res.send("Welcome to another page!")
 })
