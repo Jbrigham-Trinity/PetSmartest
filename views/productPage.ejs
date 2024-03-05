@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #04cef1 50%, #1b86f9 100%);
+            /* background: linear-gradient(left, #69b7eb 0%, #1b86f9 100%); */
+            
+
+        }
+
+        header {
+            display: flex;
+            align-items: center; /* Align items vertically in the middle */
+            justify-content: space-between; /* Optional: Adjusts spacing between items */
+            background: linear-gradient(to right, #04cef1 50%, #1b86f9 100%);
+            color: white;
+            padding: 10px 20px; /* Adjust padding as needed */
+            text-align: center;
+        }
+
+        .product {
+            background-color: #81D4FA;
+            margin: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        footer {
+            background-color: #0277BD;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc; /* Light grey border */
+            border-radius: 25px; /* Fully rounded edges */
+            outline: none; /* Removes the outline to make it look cleaner */
+            font-size: 16px; /* Larger text for better readability */
+        }
+
+        /* Styling for the search button to match */
+        button[type="submit"] {
+            padding: 10px 10px;
+            border: none;
+            border-radius: 25px; /* Match the input's roundness */
+            background-color: #007bff; /* Example blue background */
+            color: white;
+            font-size: 16px; /* Match the input's font size */
+            cursor: pointer; /* Changes the cursor to indicate it's clickable */
+            outline: none;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3; /* A darker blue on hover for visual feedback */
+        }
+        icon-link {
+            color: white;
+            text-decoration: none;
+        }
+        /* Change color of FontAwesome icons */
+        .fas {
+            color: #ffffff; /* Changes all FontAwesome solid icons to red */
+        }
+
+        /* Specific icon by using its unique class */
+        .fa-search {
+            color: #ffffff; /* Changes only the search icons to red */
+            align-items: center;
+        }
+
+        /* Change color on hover for all FontAwesome icons */
+        .fas:hover {
+            color: #00fffb; /* Changes to green on hover */
+        }
+        .search-form {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-input {
+            padding: 10px;
+            border: 2px solid #ccc; /* Example border color */
+            border-radius: 50px; /* Fully rounded edges */
+            outline: none;
+            font-size: 16px; /* Example font size */
+            margin-right: -30px; /* Overlap the button over the input */
+            z-index: 0; /* Ensure the input overlaps the button */
+        }
+
+        .search-button {
+            padding: 5px;
+            border: none;
+            background-color: #007bff; /* Example button color */
+            color: white;
+            border-radius: 50px; /* Fully rounded edges */
+            cursor: pointer;
+            outline: none;
+            z-index: 1; /* Ensure the button is under the input field */
+            position: relative;
+            right: 5px; /* Adjust based on the size of your button */
+            font-size: 20px; /* Example size, adjust as needed */
+        }
+
+        .search-button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+        .fas fa-shopping-cart {
+            align-items: right;
+        }
+        .fas fa-user {
+            align-items: right;
+        }
+        nav {
+            background: linear-gradient(to right, #04cef1 50%, #1b86f9 100%);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav button {
+            padding: 10px 50px;
+            border: none;
+            background-color: #007bff; /* Example button color */
+            color: white;
+            border-radius: 50px; /* Fully rounded edges */
+            cursor: pointer;
+            outline: none;
+            z-index: 10; /* Ensure the button is under the input field */
+            position: relative;
+            right: 30px; /* Adjust based on the size of your button */
+        }
+
+
+
+
+        </style>
+<header>
+    <a href="home.ejs" class="icon-link">
+        <i class="fas fa-home fa-2x"></i>
+    </a>
+    <form action="/search" method="get" class="search-form">
+        <input type="text" name="q" placeholder="Search..." class="search-input">
+        <button type="submit" class="search-button">
+            <i class="fas fa-search"></i> <!-- This is assuming you're using FontAwesome for icons -->
+        </button>
+    </form>
+    
+    <a href="shoppingCart.ejs" class="icon-link">
+        <i class="fas fa-shopping-cart fa-2x"></i>
+    </a>
+    <a href="profile.ejs" class="icon-link">
+        <i class="fas fa-user fa-2x"></i>
+    </a>
+</header>
+<nav>
+    <button class="nav-button">Food</button>
+    <button class="nav-button">Toys</button>
+    <button class="nav-button">Accessories</button>
+    <button class="nav-button">Health</button>
+    <button class="nav-button">Services</button>
+    <button class="nav-button">Brands</button>
+    <button class="nav-button">Sale</button>
+    <button class="nav-button">New</button>
+    <button class="nav-button">Help</button>
+    <button class="nav-button">FAQs</button>
+</nav>
+<body>
+
+
+</body>
+</html>
