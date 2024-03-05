@@ -13,10 +13,14 @@ app.get("/", function (req, res) {
     res.send(`Hello ${name}!`);
     */
     res.render('home')
+    res.render('productPage')
 });
 
 app.get("/accounts", function (req, res) {
     res.send("Welcome to another page!")
+})
+app.get("/productPage", function (req, res) {
+    res.render('productPage')
 })
 
 app.listen(port, function () {
