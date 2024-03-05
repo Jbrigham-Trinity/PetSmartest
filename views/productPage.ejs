@@ -57,7 +57,7 @@
         }
 
         button[type="submit"]:hover {
-            background-color: #0056b3;
+            /* background-color: #0056b3; */
         }
         .search-form {
             display: flex;
@@ -103,8 +103,14 @@
             margin-right: 10px;
         }
 
-        .fas:hover {
-            color: #00fffb;
+        .fa-shopping-cart:hover {
+            color: #007bff;
+        }
+        .fa-user:hover {
+            color: #007bff;
+        }
+        .fa-home:hover {
+            color: #007bff;
         }
         
         nav {
@@ -124,13 +130,17 @@
             outline: none;
             font-size: 18px;
         }
+        nav button:hover {
+            background-color: #0056b3;
+            transform: translateY(-0.25em);
+        }
 
 
 
 
         </style>
 <header>
-    <a href="home.ejs" class="icon-link">
+    <a href= home.ejs class="icon-link">
         <i class="fas fa-home fa-2x"></i>
     </a>
     <form action="/search" method="get" class="search-form">
@@ -140,11 +150,11 @@
         </button>
     </form>
     
-    <a href="shoppingCart.ejs" class="icon-link">
+    <a href= shoppingCart.ejs class="icon-link">
         <i class="fas fa-shopping-cart fa-2x"></i>
     </a>
 
-    <a href="profile.ejs" class="icon-link">
+    <a href= profile.ejs class="icon-link">
         <i class="fas fa-user fa-2x"></i>
     </a>
 </header>
