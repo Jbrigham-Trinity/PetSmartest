@@ -8,23 +8,48 @@
     }
     h1 {
         z-index: 1;
+        font-size: xx-large;
+    }
+    button {
+        text-align: center;
+    }
+    img {
+        z-index: 0;
     }
 button {
     background-color: aliceblue;
     border-radius: 5px;
 }
+.wireframe-button {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 2px solid white;
+            background-color: rgba(255, 255, 255, 0.198);
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .wireframe-button:hover {
+            background-color: white;
+            color: #333; /* Change the color on hover as needed */
+        }
 </style>
 </head>
 <body>
 
 <div style="text-align: center;">
 
-    <h1>welcome to homepage </h1>
-    //<h2> there should be a picture of a dog here </h2>
+    <h1>BLUEDOG SHOPPING</h1>
     <img style="align-self: center" src="doggert.png" width="400" height="400">
-    <a href="productPage">
-    <button type="button"> Click me </button>
-    </a>
     </div>
+    <div style="text-align: center">
+    <a href="productPage">
+    <button class="wireframe-button"> Click me </button>
+    </a>
+    <div>
 </body>
 </html>
