@@ -2,21 +2,39 @@
 <html>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        body, html {
             margin: 0;
             padding: 0;
+            font-family: Arial, sans-serif;
             background: linear-gradient(to right, #04cef1 50%, #1b86f9 100%);
+            padding-top: 60px; /* Adjust this value based on the total height of your fixed header and nav */
+        }
+
+        header, nav {
+            position: fixed;
+            width: 100%;
+            background: linear-gradient(to right, #04cef1 50%, #1b86f9 100%);
+            color: white;
+            display: flex;
+            /* align-items: center; */
+            padding: 10px 20px;
+            z-index: 10;
+        }
+
+        .center-search, .left-icons, .right-icons {
+            display: flex;
+            align-items: center;
         }
 
         header {
-            display: flex;
-            align-items: center;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            background: linear-gradient(to right, #04cef1 50%, #1b86f9 100%);
-            /* position : fixed; */
+            top: 0;
+            justify-content: space-between;
+        }
+
+        nav {
+            top: 60px; /* Adjust this value based on the height of your header */
+            justify-content: center;
+            gap: 10px;
         }
 
         input[type="text"] {
@@ -25,7 +43,7 @@
             border-radius: 25px;
             outline: none;
             font-size: 16px;
-            margin-left: 580px;
+            /* margin-left: 580px; */
             align-items: center;
         }
         button[type="submit"] {
@@ -38,7 +56,7 @@
             cursor: pointer;
             outline: none;
             align-items: center;
-            margin-right: 620px;
+            justify-self: center;
         }
 
         .search-form {
@@ -55,7 +73,6 @@
             font-size: 16px;
             margin-right: -30px;
             z-index: 0;
-            align-items: center;
         }
 
         .search-button {
@@ -70,7 +87,6 @@
             position: relative;
             right: 5px;
             font-size: 20px;
-            align-items: center;
         }
 
         .search-button:hover {
@@ -81,18 +97,19 @@
         }
         .fa-shopping-cart {
             color: #ffffff;
-            align-items: center;
+            align-items: left;
             margin-right: 10px;
+            justify-self: flex-end;
+
+        }
+        .fa-user {
+            align-items: center;
+            margin-right: 50px; 
         }
 
-        .fa-shopping-cart:hover {
-            color: #007bff;
-        }
-        .fa-user:hover {
-            color: #007bff;
-        }
-        .fa-home:hover {
-            color: #007bff;
+        .fa-shopping-cart:hover, .fa-user:hover, .fa-home:hover {
+            transform: scale(1.5);
+            transition: transform 0.3s ease-in-out;
         }
         
         nav {
@@ -119,11 +136,11 @@
         }
         .product {
             /* background-color: aquamarine; */
-            /* padding: 5px; */
+            padding: 5px;
             border-radius: 10px;
             text-align: center;
             color: white;
-            border: 5px solid white; /* Blue border for distinction */
+            border: 5px solid white;
         }
 
         .product-grid {
@@ -158,183 +175,228 @@
             object-fit: cover;
             border-radius: 10px;
         }
-
-
-
-
-
-
-        </style>
-<header>
-    <a href= home.ejs class="icon-link">
-        <i class="fas fa-home fa-2x"></i>
-    </a>
-    <form action="/search" method="get" class="search-form">
-        <input type="text" name="q" placeholder="Search..." class="search-input">
-        <button type="submit" class="search-button">
-            <i class="fas fa-search"></i>
-        </button>
-    </form>
+    </style>
+    <header>
+        <div class="left-icons">
+            <a href="home.ejs" class="icon-link">
+                <i class="fas fa-home fa-2x"></i>
+            </a>
+        </div>
+        <div class="center-search">
+            <form action="/search" method="get" class="search-form">
+                <input type="text" name="q" placeholder="Search..." class="search-input">
+                <button type="submit" class="search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+        <div class="right-icons">
+            <a href="shoppingCart.ejs" class="icon-link">
+                <i class="fas fa-shopping-cart fa-2x"></i>
+            </a>
+            <a href="profile.ejs" class="icon-link">
+                <i class="fas fa-user fa-2x"></i>
+            </a>
+        </div>
+    </header>
     
-    <a href= shoppingCart.ejs class="icon-link">
-        <i class="fas fa-shopping-cart fa-2x"></i>
-    </a>
-
-    <a href= profile.ejs class="icon-link">
-        <i class="fas fa-user fa-2x"></i>
-    </a>
-</header>
-<nav>
-    <button class="nav-button">FOOD</button>
-    <button class="nav-button">TOYS</button>
-    <button class="nav-button">ACCESORIES</button>
-    <button class="nav-button">HEALTH</button>
-    <button class="nav-button">SERVICES</button>
-    <button class="nav-button">BRANDS</button>
-    <button class="nav-button">SALE</button>
-    <button class="nav-button">NEW</button>
-    <button class="nav-button">HELP</button>
-    <button class="nav-button">FAQS</button>
-</nav>
-<body>
-<!-- JS for products inserted here -->
-<div class="product-grid">
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <div class="product">
-        <h2>Product Name</h2>
-        <img src="https://via.placeholder.com/150" alt="Product Image">
-        <button>Add to Cart</button>
-        <button>Buy Now</button>
-        <button>View Reviews</button>
-        <p>Product Description</p>
-        <p>Price: $0.00</p>
-    </div>
-    <!-- add JS to do this later -->
-</div>
-</body>
+    <nav>
+        <button class="nav-button">FOOD</button>
+        <button class="nav-button">TOYS</button>
+        <button class="nav-button">ACCESORIES</button>
+        <button class="nav-button">HEALTH</button>
+        <button class="nav-button">SERVICES</button>
+        <button class="nav-button">BRANDS</button>
+        <button class="nav-button">SALE</button>
+        <button class="nav-button">NEW</button>
+        <button class="nav-button">HELP</button>
+        <button class="nav-button">FAQS</button>
+    </nav>
+    <body>
+    <!-- JS for products inserted here -->
+        <div class="product-grid">
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            <div class="product">
+                <img src="https://via.placeholder.com/150" alt="Product Image">
+                <h2>Product Name</h2>
+                <button>Add to Cart</button>
+                <button>Buy Now</button>
+                <button>View Reviews</button>
+                <p>Product Description</p>
+                <p>Price: $0.00</p>
+            </div>
+            
+            <!-- add JS to do this later -->
+        </div>
+    </body>
 </html>
