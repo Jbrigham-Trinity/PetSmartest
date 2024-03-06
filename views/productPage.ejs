@@ -21,7 +21,15 @@
             z-index: 10;
         }
 
-        .center-search, .left-icons, .right-icons {
+        .logo{
+            width: 5px;
+            height: auto;
+            display: flex;
+            align-items: center;
+            object-fit: cover;
+        }
+
+        .center-search, .right-icons {
             display: flex;
             align-items: center;
         }
@@ -107,7 +115,7 @@
             margin-right: 50px; 
         }
 
-        .fa-shopping-cart:hover, .fa-user:hover, .fa-home:hover {
+        .fa-shopping-cart:hover, .fa-user:hover {
             transform: scale(1.5);
             transition: transform 0.3s ease-in-out;
         }
@@ -177,9 +185,10 @@
         }
     </style>
     <header>
-        <div class="left-icons">
-            <a href="home.ejs" class="icon-link">
-                <i class="fas fa-home fa-2x"></i>
+        <div class="logo">
+            <a href="home" class="icon-link">
+                <!-- <i class="fas fa-home"></i> -->
+                <img src="tinyDog.png">
             </a>
         </div>
         <div class="center-search">
@@ -191,7 +200,7 @@
             </form>
         </div>
         <div class="right-icons">
-            <a href="shoppingCart.ejs" class="icon-link">
+            <a href="shoppingCart" class="icon-link">
                 <i class="fas fa-shopping-cart fa-2x"></i>
             </a>
             <a href="profile.ejs" class="icon-link">
