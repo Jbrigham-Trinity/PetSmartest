@@ -226,11 +226,10 @@
         <button class="nav-button">FAQS</button>
     </nav>
     <body>
-    <!-- JS for products inserted here -->
         <div class="product-grid">
                 <script>
-                    // Define an array of product data
                     var products = [
+                        //product info goes here 
                         {
                             image: "https://via.placeholder.com/150",
                             name: "Product Name",
@@ -263,8 +262,6 @@
                         },
                         // Add more product objects here...
                     ];
-
-                    // Loop through the products array and generate HTML for each product
                     products.forEach(function(product) {
                         var productHTML = `
                             <div class="product">
@@ -280,7 +277,6 @@
                         document.querySelector(".product-grid").innerHTML += productHTML;
                     });
                 </script>
-            <!-- add JS to do this later -->
         </div>
     </body>
 </html>
