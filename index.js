@@ -6,6 +6,7 @@ const port = 3000;
 app.set('view engine', 'ejs')
 
 app.use(express.static('assets'))
+app.use(express.static('styles'))
 
 //check it out its our homepage
 
@@ -17,7 +18,6 @@ app.get("/", function (req, res) {
     res.render('home')
     res.render('productPage')
     res.render('shoppingCart')
-    res.render('home')
 });
 
 app.get("shopping", function(req, res) {
