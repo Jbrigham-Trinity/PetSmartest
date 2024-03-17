@@ -179,8 +179,8 @@
             transform: translateY(-0.25em);
         }
         .product img { /* fix the scaling */
-            width: 300px;
-            height: 300px;
+            width: 95%;
+            height: auto; /* 300 */
             object-fit: cover;
             border-radius: 10px;
         }
