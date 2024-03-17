@@ -50,7 +50,7 @@
             gap: 10px;
         }
 
-        input[type="text"] {
+        input[type="text"], input[type="password"] {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 25px;
@@ -183,10 +183,16 @@
             transform: translateY(-0.25em);
         }
         .product img {
-            width: 100px;
-            height: 100px;
+            width: 300px;
+            height: 300px;
             object-fit: cover;
             border-radius: 10px;
+        }
+        body{
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
         }
     </style>
     <header>
@@ -195,14 +201,6 @@
                 <!-- <i class="fas fa-home"></i> -->
                 <img src="tinyDog.png">
             </a>
-        </div>
-        <div class="center-search">
-            <form action="/search" method="get" class="search-form">
-                <input type="text" name="q" placeholder="Search..." class="search-input">
-                <button type="submit" class="search-button">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
         </div>
         <div class="right-icons">
             <a href="shoppingCart" class="icon-link">
@@ -214,87 +212,25 @@
         </div>
     </header>
     
-    <nav>
-        <button class="nav-button">FOOD</button>
-        <button class="nav-button">TOYS</button>
-        <button class="nav-button">ACCESORIES</button>
-        <button class="nav-button">HEALTH</button>
-        <button class="nav-button">SERVICES</button>
-        <button class="nav-button">BRANDS</button>
-        <button class="nav-button">SALE</button>
-        <button class="nav-button">NEW</button>
-        <button class="nav-button">HELP</button>
-        <button class="nav-button">FAQS</button>
-    </nav>
     <body>
-        <div class ="list">
-            <script>
-                var products = [
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        
-                    ];
-                    var total = 0
-                    products.forEach(function(product) {
-                        var productHTML = `
-                            <div class="product">
-                                <img src="${product.image}" alt="Product Image">
-                                <p>${product.name}</p>
-                                <p>Price: ${product.price}</p>
-                            </div>
-                        `;
-                        document.querySelector(".list").innerHTML += productHTML;
-                        total += product.price.toInt // might have to do some changes here
-                    });
-            </script>
-        </div>
+        <H1> Make an account </H1>
+        <input type="text" name="username" placeholder="Username" class="username">
+        <input type="text" name="petname" placeholder="Pet name" class="petInfo">
+        <br>
+        <br>
+        <input type="password" name="password" placeholder="Password" class="password">
+        <input type="password" name="password" placeholder="Confirm Password" class="password">
+        <br>
+        <br>
+        <input type="text" name="petBirthday" placeholder="Pet birthday" class="petInfo"> <!-- selector wheel -->
+        <input type="text" name="petSpecies" placeholder="Pet species" class="petInfo"> <!-- drop down menu -->
+        <!-- add selectors instead of text input -->
+        <br>
+        <br>
+        <button type="submit">Confirm</button>
+        <br>
+        <br>
+
+        <!-- add password logic -->
     </body>
 </html>

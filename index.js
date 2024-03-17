@@ -18,6 +18,8 @@ app.get("/", function (req, res) {
     res.render('home')
     res.render('productPage')
     res.render('shoppingCart')
+    res.render('login')
+    res.render('makeAccount')
 });
 
 app.get("shopping", function(req, res) {
@@ -34,6 +36,12 @@ app.get("/shoppingCart", function (req, res){
 })
 app.get("/home", function (req, res){
     res.render('home.ejs')
+})
+app.get("/login", function (req, res){
+    res.render('login.ejs')
+})
+app.get("/makeAccount", function (req, res){
+    res.render('makeAccount.ejs')
 })
 
 app.listen(port, function () {
