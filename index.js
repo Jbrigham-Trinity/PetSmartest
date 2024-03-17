@@ -5,8 +5,7 @@ const port = 3000;
 //running this makes us able to load express files as web pages
 app.set('view engine', 'ejs')
 
-app.use(express.static('assets'))
-app.use(express.static('styles'))
+app.use(express.static('public'));
 
 //check it out its our homepage
 
