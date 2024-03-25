@@ -1,19 +1,61 @@
-const express = require("express");
+const express = require('express');
 const app = express();
 const port = 3000;
+const mysql = require('mysql2');
+const Product = require('./db_connect');
+const dotenv = require('dotenv');
+dotenv.config();
 
 //running this makes us able to load express files as web pages
 app.set('view engine', 'ejs')
 
 app.use(express.static('public'));
 
-//check it out its our homepage
+const pool = mysql.createPool({
+    host: process.env.DATABASE_HOST,
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME
+});
 
+// Homepage route
 app.get("/", function (req, res) {
-    /*
+    res.render('home');
+});
+
+// Product page route
+app.get("/productPage", async function (req, res) {
+    try {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database:', err);
+                return;
+            }
+            console.log(`MySQL Connected`);
+            
+            const productInstance = Product.getProductInstance();
+            productInstance.getAllData(connection)
+                .then(products => {
+                    res.render('productPage', { products });
+                })
+                .catch(error => {
+                    console.error('Error fetching product data:', error);
+                    res.status(500).send('Internal Server err');
+                })
+                .finally(() => {
+                    connection.release();
+                });
+        });
+    } catch (error) {
+        console.error('Error fetching product data:', error);
+        res.status(500).send('Internal Server err');
+    }
+});
+app.get("/", function (req, res) {
+    
     let name = (typeof req.query.name === 'undefined') ? "World" : req.query.name;
     res.send(`Hello ${name}!`);
-    */
+    
     res.render('home')
     res.render('productPage')
     res.render('shoppingCart')

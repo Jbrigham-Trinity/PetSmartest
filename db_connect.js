@@ -1,16 +1,31 @@
-const mysql = require('mysql')
-require('dotenv').config();
+const mysql = require('mysql2');
+const dotenv = require('dotenv');
+dotenv.config();
 
-const connection = mysql.createConnection({
-	host : process.env.DATABASE_HOST,
-	user : process.env.DATABASE_USER,
-	password : process.env.DATABASE_PASSWORD,
-	database : process.env.DATABASE_NAME
-})
+class Product {
+	static getProductInstance(){
+        if (!this.instance) {
+            this.instance = new Product();
+        }
+        return this.instance;
+    }
 
-connection.connect((err => {
-    if(err) throw err;
-    console.log(`MySQL Connected`);
-}));
+	async getAllData(connection) {
+		return new Promise((resolve, reject) => {
+			connection.query("SELECT * FROM products", (err, rows) => {
+				if (err) {
+					console.error('Error executing SQL query:', err);
+					connection.release(); // Release the connection back to the pool
+					reject(err); // Reject the promise with the error
+				} else {
+					// Process fetched products
+					console.log('Fetched products:', rows);
+					const products = rows.map(row => row); 
+					resolve(products); // Resolve the promise with the array of products					
+				}
+			});
+		});
+	}
+}
 
-exports.db_connection = connection
+module.exports = Product;
