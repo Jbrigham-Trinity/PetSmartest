@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body, html {
@@ -227,56 +228,18 @@
     </nav>
     <body>
         <div class="product-grid">
-                <script>
-                    var products = [
-                        //product info goes here 
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            description: "Product Description",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            description: "Product Description",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            description: "Product Description",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            description: "Product Description",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            description: "Product Description",
-                            price: "$0.00"
-                        },
-                        // Add more product objects here...
-                    ];
-                    products.forEach(function(product) {
-                        var productHTML = `
-                            <div class="product">
-                                <img src="${product.image}" alt="Product Image">
-                                <h2>${product.name}</h2>
-                                <button>Add to Cart</button>
-                                <button>Buy Now</button>
-                                <button>View Reviews</button>
-                                <p>${product.description}</p>
-                                <p>Price: ${product.price}</p>
-                            </div>
-                        `;
-                        document.querySelector(".product-grid").innerHTML += productHTML;
-                    });
-                </script>
+            <% products.forEach(function(product) { %>
+                <div class="product">
+                    <img src="<%= product.image %>" alt="Product Image">
+                    <h2><%= product.Name %></h2>
+                    <p><%= product.Description %></p>
+                    <p>Price: <%= product.Price %></p>
+                    <!-- Add any additional product details here -->
+                    <button>Add to Cart</button>
+                    <button>Buy Now</button>
+                    <button>View Reviews</button>
+                </div>
+            <% }); %>
         </div>
     </body>
 </html>
