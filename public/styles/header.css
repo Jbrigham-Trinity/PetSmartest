@@ -45,7 +45,7 @@ nav {
     gap: 10px;
 }
 
-input[type="text"] {
+input[type="text"], input[type="password"] {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 25px;
@@ -182,4 +182,10 @@ nav button:hover {
     height: 300px;
     object-fit: cover;
     border-radius: 10px;
+}
+body{
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
 }

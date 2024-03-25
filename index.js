@@ -9,8 +9,7 @@ dotenv.config();
 //running this makes us able to load express files as web pages
 app.set('view engine', 'ejs')
 
-app.use(express.static('assets'))
-app.use(express.static('styles'))
+app.use(express.static('public'));
 
 const pool = mysql.createPool({
     host: process.env.DATABASE_HOST,
@@ -52,7 +51,7 @@ app.get("/productPage", async function (req, res) {
         res.status(500).send('Internal Server err');
     }
 });
-/*app.get("/", function (req, res) {
+app.get("/", function (req, res) {
     
     let name = (typeof req.query.name === 'undefined') ? "World" : req.query.name;
     res.send(`Hello ${name}!`);
@@ -60,7 +59,9 @@ app.get("/productPage", async function (req, res) {
     res.render('home')
     res.render('productPage')
     res.render('shoppingCart')
-});*/
+    res.render('login')
+    res.render('makeAccount')
+});
 
 app.get("shopping", function(req, res) {
     res.render("productPage.ejs")
@@ -76,6 +77,12 @@ app.get("/shoppingCart", function (req, res){
 })
 app.get("/home", function (req, res){
     res.render('home.ejs')
+})
+app.get("/login", function (req, res){
+    res.render('login.ejs')
+})
+app.get("/makeAccount", function (req, res){
+    res.render('makeAccount.ejs')
 })
 
 app.listen(port, function () {
