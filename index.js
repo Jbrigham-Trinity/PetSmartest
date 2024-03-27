@@ -34,7 +34,7 @@ app.get("/productPage", async function (req, res) {
             console.log(`MySQL Connected`);
             
             const productInstance = Product.getProductInstance();
-            productInstance.getAllData(connection)
+            productInstance.getProductData(connection)
                 .then(products => {
                     res.render('productPage', { products });
                 })

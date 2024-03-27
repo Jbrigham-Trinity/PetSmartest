@@ -10,7 +10,7 @@ class Product {
         return this.instance;
     }
 
-	async getAllData(connection) {
+	async getProductData(connection) {
 		return new Promise((resolve, reject) => {
 			connection.query("SELECT * FROM products", (err, rows) => {
 				if (err) {
