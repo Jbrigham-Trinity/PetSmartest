@@ -85,6 +85,13 @@ app.get("/makeAccount", function (req, res){
     res.render('makeAccount.ejs')
 })
 
+app.get("/adminLogin",function (req, res){
+    res.render("adminLogin.ejs")
+})
+
+app.get("/adminPage",function (req, res){
+    res.render("adminPage.ejs")
+})
 app.listen(port, function () {
     console.log(`Example app listening on port ${port}!`);
 });
