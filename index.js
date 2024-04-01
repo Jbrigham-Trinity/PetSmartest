@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const app = express();
 const port = 3000;
 const mysql = require('mysql2');
@@ -75,6 +76,43 @@ app.get("/productPage", function (req, res) {
 app.get("/shoppingCart", function (req, res){
     res.render('shoppingCart')
 })
+
+// Ensure express-session is installed and set up
+app.use(session({
+  secret: 'yourSecretKey',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}));
+
+// app.use((req, res, next) => {
+//     if (!req.session.cart) {
+//         req.session.cart = []; // Initialize the cart if it doesn't exist
+//     }
+//     next();
+// });
+
+
+
+// Route to handle adding items to the cart
+app.post("/addToCart", async (req, res) => {
+    // const productId = req.body.productID; // Assuming you send the product ID in the request
+
+    // // Example: Fetch the product details from your database
+    // // This is a placeholder - you'll need to implement actual database logic based on your setup
+    // const product = await findProductById(productId);
+
+    // if (!req.session.cart) {
+    //     req.session.cart = [];
+    // }
+
+    // req.session.cart.push(product); // Add the product to the session cart
+    res.redirect('/shoppingCart');
+});
+
+
+
+
 app.get("/home", function (req, res){
     res.render('home.ejs')
 })

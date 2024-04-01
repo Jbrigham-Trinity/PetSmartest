@@ -99,16 +99,18 @@
                     var total = 0
                     products.forEach(function(product) {
                         var productHTML = `
-                            <div class="product">
+                            <div class="products">
                                 <img src="${product.image}" alt="Product Image">
                                 <p>${product.name}</p>
                                 <p>Price: ${product.price}</p>
                             </div>
                         `;
+
+                        
                         document.querySelector(".list").innerHTML += productHTML;
                         total += product.price.toInt // might have to do some changes here
                     });
-            </script>
+            </script>        
         </div>
     </body>
 </html>
