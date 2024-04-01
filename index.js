@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const mysql = require('mysql2');
-const Product = require('./db_connect');
+const { Product, createUser } = require('./db_connect');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -10,6 +10,7 @@ dotenv.config();
 app.set('view engine', 'ejs')
 
 app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true })); // Parse request body
 
 const pool = mysql.createPool({
     host: process.env.DATABASE_HOST,
@@ -31,7 +32,7 @@ app.get("/productPage", async function (req, res) {
                 console.error('Error connecting to database:', err);
                 return;
             }
-            console.log(`MySQL Connected`);
+            console.log(`MySQL Connected to print product`);
             
             const productInstance = Product.getProductInstance();
             productInstance.getProductData(connection)
@@ -84,7 +85,37 @@ app.get("/login", function (req, res){
 app.get("/makeAccount", function (req, res){
     res.render('makeAccount.ejs')
 })
+app.post('/makeAccount', async (req, res) => {
+    const { username, password, confirmPassword, email } = req.body;
 
+    if (password === '' | username === '' | email === '') {
+        return res.status(400).send('Please fill in all information');
+    }
+    try {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database:', err);
+                return;
+            }
+            console.log(`MySQL Connected to create user account`);
+            createUser(username, password, email, connection)
+            .then(
+                res.send('User created successfully')
+            )
+            .catch(error => {
+                console.error('Error creating account:', error);
+                res.status(500).send('Internal Server err');
+            })
+            .finally(() => {
+                connection.release();
+            });
+         });
+
+    } catch (error) {
+        console.error('Error creating user:', error);
+        res.status(500).send('Error creating user');   
+    }
+})
 app.listen(port, function () {
     console.log(`Example app listening on port ${port}!`);
 });
