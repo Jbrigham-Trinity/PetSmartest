@@ -51,8 +51,10 @@
                     <p>Price: $<%= products.Price %></p>
                     <!-- Add any additional product details here -->
                     <form action="/addToCart" method="post">
-                        <input type="hidden" name="productID" value="<%= products.Name %>" />
+                        <input type="hidden" name="productName" value="<%= products.Name %>">
                         <button type="submit">Add to Cart</button>
+                    </form>
+                    
                     <button>Buy Now</button>
                     <button>View Reviews</button>
                 </div>

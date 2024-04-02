@@ -41,63 +41,10 @@
         <button class="nav-button">FAQS</button>
     </nav>
     <body>
-        <div class ="list">
+        <!-- <div class ="list">
             <script>
-                var products = [
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        {
-                            image: "https://via.placeholder.com/150",
-                            name: "Product Name",
-                            price: "$0.00"
-                        },
-                        
-                    ];
                     var total = 0
-                    products.forEach(function(product) {
+                    cart.forEach(function(product) {
                         var productHTML = `
                             <div class="products">
                                 <img src="${product.image}" alt="Product Image">
@@ -105,12 +52,27 @@
                                 <p>Price: ${product.price}</p>
                             </div>
                         `;
-
-                        
                         document.querySelector(".list").innerHTML += productHTML;
                         total += product.price.toInt // might have to do some changes here
                     });
-            </script>        
+            </script>      
+        </div> -->
+
+        <div class="product-grid">
+            <% var total = 0.0; %>
+            <% cart.forEach(function(products) { %>
+                <div class="products">
+                    <img src="<%= products.ImageURL %>" alt="Product Image">
+                    <h2><%= products.Name %></h2>
+                    <p><%= products.Description %></p>
+                    <p>Price: $<%= products.Price %></p>
+                </div>
+                <% total += parseFloat(products.Price); %>
+            <% }); %>
         </div>
+        <div class="total">
+            <h2>Total: $<%= total.toFixed(2) %></h2>
+        </div>
+    
     </body>
 </html>

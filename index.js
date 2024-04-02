@@ -8,6 +8,10 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 //running this makes us able to load express files as web pages
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+
 app.set('view engine', 'ejs')
 
 app.use(express.static('public'));
@@ -18,6 +22,13 @@ const pool = mysql.createPool({
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME
 });
+
+app.use(session({
+    secret: 'yourSecretKey',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: process.env.NODE_ENV === 'production' } // Secure in production only
+  }));
 
 // Homepage route
 app.get("/", function (req, res) {
@@ -73,17 +84,20 @@ app.get("/accounts", function (req, res) {
 app.get("/productPage", function (req, res) {
     res.render('productPage')
 })
-app.get("/shoppingCart", function (req, res){
-    res.render('shoppingCart')
-})
+app.get("/shoppingCart", function (req, res) {
+    // Ensure there's a cart array in the session, if not, create an empty one
+    if (!req.session.cart) {
+        req.session.cart = [];
+    }
+    // Pass the cart to the shoppingCart.ejs template
+    console.log(req.session.cart); // Add this line to log the cart's contents
+    res.render('shoppingCart', { cart: req.session.cart });
+});
+
 
 // Ensure express-session is installed and set up
-app.use(session({
-  secret: 'yourSecretKey',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true }
-}));
+// Ensure express-session is installed and set up
+
 
 app.get("/search", function (req, res) {
     const searchQuery = req.query.q; // Extract the search query from the URL parameter
@@ -109,30 +123,40 @@ app.get("/search", function (req, res) {
 });
 
 
-// app.use((req, res, next) => {
-//     if (!req.session.cart) {
-//         req.session.cart = []; // Initialize the cart if it doesn't exist
-//     }
-//     next();
-// });
+app.use((req, res, next) => {
+    if (!req.session.cart) {
+        req.session.cart = []; // Initialize the cart if it doesn't exist
+    }
+    next();
+});
 
 
 
 // Route to handle adding items to the cart
 app.post("/addToCart", async (req, res) => {
-    // const productId = req.body.productID; // Assuming you send the product ID in the request
+    const productName = req.body.productName; // Ensure the name matches your form/input name
 
-    // // Example: Fetch the product details from your database
-    // // This is a placeholder - you'll need to implement actual database logic based on your setup
-    // const product = await findProductById(productId);
-
-    // if (!req.session.cart) {
-    //     req.session.cart = [];
-    // }
-
-    // req.session.cart.push(product); // Add the product to the session cart
-    res.redirect('/shoppingCart');
+    pool.getConnection(async (err, connection) => {
+        if (err) throw err; // or handle error appropriately
+        const sql = "SELECT * FROM Products WHERE Name = ?"; // Adjust according to your schema
+        connection.query(sql, [productName], (err, results) => {
+            if (err) throw err; // or handle error appropriately
+            if (results.length > 0) {
+                const product = results[0];
+                if (!req.session.cart) {
+                    req.session.cart = [];
+                }
+                req.session.cart.push(product); // Add the product to the session cart
+                res.redirect('/shoppingCart');
+            } else {
+                // Handle case where product is not found
+                res.send("Product not found");
+            }
+            connection.release();
+        });
+    });
 });
+
 
 
 
