@@ -85,6 +85,30 @@ app.use(session({
   cookie: { secure: true }
 }));
 
+app.get("/search", function (req, res) {
+    const searchQuery = req.query.q; // Extract the search query from the URL parameter
+
+    if (!searchQuery) {
+        res.render('productPage', { products: [] }); // Handle case where search query is empty
+        return;
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) throw err; // or handle error appropriately
+        
+        let sql = `SELECT * FROM Products WHERE Name LIKE ?;`; // Adjust table name and fields according to your schema
+        let query = `%${searchQuery}%`; // Prepare the search query for SQL LIKE operator
+        
+        connection.query(sql, [query], (err, results) => {
+            if (err) throw err; // or handle error appropriately
+            
+            res.render('productPage', { products: results }); // Assuming 'productPage.ejs' can display a list of products
+            connection.release();
+        });
+    });
+});
+
+
 // app.use((req, res, next) => {
 //     if (!req.session.cart) {
 //         req.session.cart = []; // Initialize the cart if it doesn't exist
