@@ -174,6 +174,15 @@ app.post("/buyNow", async (req, res) => {
         });
     });
 });
+app.post("/removeFromCart", async (req, res) => {
+    const productName = req.body.productName; // Ensure the name matches your form/input name
+
+    if (!req.session.cart) {
+        req.session.cart = [];
+    }
+    req.session.cart = req.session.cart.filter(product => product.Name !== productName); // Remove the product from the session cart
+    res.redirect('/shoppingCart');
+});
 
 
 

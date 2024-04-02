@@ -48,6 +48,10 @@
                     <h2><%= products.Name %></h2>
                     <p><%= products.Description %></p>
                     <p>Price: $<%= products.Price %></p>
+                    <form action="/removeFromCart" method="post">
+                        <input type="hidden" name="productName" value="<%= products.Name %>">
+                        <button type="submit">Remove</button>
+                    </form>
                 </div>
                 <% total += parseFloat(products.Price); %>
             <% }); %>
