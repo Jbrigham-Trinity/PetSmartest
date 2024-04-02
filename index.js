@@ -142,6 +142,29 @@ app.post("/addToCart", async (req, res) => {
                     req.session.cart = [];
                 }
                 req.session.cart.push(product); // Add the product to the session cart
+                res.redirect('/productPage');
+            } else {
+                // Handle case where product is not found
+                res.send("Product not found");
+            }
+            connection.release();
+        });
+    });
+});
+app.post("/buyNow", async (req, res) => {
+    const productName = req.body.productName; // Ensure the name matches your form/input name
+
+    pool.getConnection(async (err, connection) => {
+        if (err) throw err; // or handle error appropriately
+        const sql = "SELECT * FROM Products WHERE Name = ?"; // Adjust according to your schema
+        connection.query(sql, [productName], (err, results) => {
+            if (err) throw err; // or handle error appropriately
+            if (results.length > 0) {
+                const product = results[0];
+                if (!req.session.cart) {
+                    req.session.cart = [];
+                }
+                req.session.cart.push(product); // Add the product to the session cart
                 res.redirect('/shoppingCart');
             } else {
                 // Handle case where product is not found
@@ -151,7 +174,6 @@ app.post("/addToCart", async (req, res) => {
         });
     });
 });
-
 
 
 
