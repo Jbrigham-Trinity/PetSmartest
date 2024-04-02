@@ -94,11 +94,6 @@ app.get("/shoppingCart", function (req, res) {
     res.render('shoppingCart', { cart: req.session.cart });
 });
 
-
-// Ensure express-session is installed and set up
-// Ensure express-session is installed and set up
-
-
 app.get("/search", function (req, res) {
     const searchQuery = req.query.q; // Extract the search query from the URL parameter
 
