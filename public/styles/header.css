@@ -189,3 +189,9 @@ body{
     text-align: center;
     color: white;
 }
+.product-buttons {
+    display: flex;
+    }
+.product-info {
+    align-items: flex-end;
+}
