@@ -27,15 +27,25 @@ class Product {
 	}
 }
 
-
-
-async function getUserByUsernameAndPassword(username, password) {
-	try {
-	const [rows] = await connection.query('SELECT * from users WHERE username = ? AND password = ?', [username, password])
-	return rows.length > 0 ? rows[0] : null;
-	} catch (error){
-		throw error;
-	}
+async function verifyUserAccount(username, password, connection) {
+    try {
+        return new Promise((resolve, reject) => {
+            connection.query('SELECT * FROM users WHERE Username = ? AND PasswordHash = ?', [username, password], 
+            (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    if (results.length === 0) {
+                        reject(new Error('Invalid username or password.'));
+                    } else {
+                        resolve(results);
+                    }
+                }
+            });
+        });
+    } catch (error) {
+        throw error;
+    }
 }
 
 async function createUser(username, password, email, connection) {
@@ -43,7 +53,7 @@ async function createUser(username, password, email, connection) {
         const result = await new Promise((resolve, reject) => {
             connection.query(
                 "INSERT into users (UserID, Username, PasswordHash, Email) VALUES (?,?,?,?)",
-                [11, username, password, email],
+                [1, username, password, email],
                 (error, results) => {
                     if (error) {
                         reject(error); // Reject the promise if there's an error
@@ -63,5 +73,5 @@ async function createUser(username, password, email, connection) {
         connection.release(); // Release the database connection
     }
 }
-module.exports = { Product, createUser };
+module.exports = { Product, createUser, verifyUserAccount };
 

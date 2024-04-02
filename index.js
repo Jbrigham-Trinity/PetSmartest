@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const mysql = require('mysql2');
-const { Product, createUser } = require('./db_connect');
+const { Product, createUser, verifyUserAccount} = require('./db_connect');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -31,9 +31,7 @@ app.get("/productPage", async function (req, res) {
             if (err) {
                 console.error('Error connecting to database:', err);
                 return;
-            }
-            console.log(`MySQL Connected to print product`);
-            
+            }            
             const productInstance = Product.getProductInstance();
             productInstance.getProductData(connection)
                 .then(products => {
@@ -82,6 +80,34 @@ app.get("/home", function (req, res){
 app.get("/login", function (req, res){
     res.render('login.ejs')
 })
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    try{
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database:', err);
+                return;
+            }
+            verifyUserAccount(username, password, connection)
+                .then(user => {
+                    if (user) {
+                        res.send('Login successful');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error verifying user account:', error);
+                    res.status(401).send('Invalid username or password');
+                })
+                .finally(() => {
+                    connection.release();
+                });
+        });
+    } catch (error) {
+        console.error('Error processing login request:', error);
+        res.status(500).send('Internal Server Error');
+    }
+})
+
 app.get("/makeAccount", function (req, res){
     res.render('makeAccount.ejs')
 })
@@ -91,6 +117,9 @@ app.post('/makeAccount', async (req, res) => {
     if (password === '' | username === '' | email === '') {
         return res.status(400).send('Please fill in all information');
     }
+    if (password !== confirmPassword){
+        return res.status(400).send('Password and Confirm Password do not match');
+    }
     try {
         pool.getConnection((err, connection) => {
             if (err) {
@@ -99,12 +128,14 @@ app.post('/makeAccount', async (req, res) => {
             }
             console.log(`MySQL Connected to create user account`);
             createUser(username, password, email, connection)
-            .then(
-                res.send('User created successfully')
-            )
+            .then(results => {
+                if (results) {
+                    res.send('User Created Successfully');
+                }
+            })
             .catch(error => {
                 console.error('Error creating account:', error);
-                res.status(500).send('Internal Server err');
+                res.status(401).send('Error creating account');
             })
             .finally(() => {
                 connection.release();
