@@ -6,6 +6,8 @@ const Product = require('./db_connect');
 const dotenv = require('dotenv');
 dotenv.config();
 
+//
+
 //running this makes us able to load express files as web pages
 app.set('view engine', 'ejs')
 
