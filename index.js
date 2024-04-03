@@ -1,14 +1,17 @@
 const express = require('express');
-const app = express();
-const port = 3000;
+const session = require('express-session');
 const mysql = require('mysql2');
 const Product = require('./db_connect');
 const dotenv = require('dotenv');
+
+const app = express();
+const port = 3000;
 dotenv.config();
 
-//
 
-//running this makes us able to load express files as web pages
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.set('view engine', 'ejs')
 
 app.use(express.static('public'));
@@ -20,12 +23,17 @@ const pool = mysql.createPool({
     database: process.env.DATABASE_NAME
 });
 
-// Homepage route
+app.use(session({
+    secret: 'yourSecretKey',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+
 app.get("/", function (req, res) {
     res.render('home');
 });
 
-// Product page route
 app.get("/productPage", async function (req, res) {
     try {
         pool.getConnection((err, connection) => {
@@ -33,7 +41,6 @@ app.get("/productPage", async function (req, res) {
                 console.error('Error connecting to database:', err);
                 return;
             }
-            console.log(`MySQL Connected`);
             
             const productInstance = Product.getProductInstance();
             productInstance.getProductData(connection)
@@ -53,8 +60,8 @@ app.get("/productPage", async function (req, res) {
         res.status(500).send('Internal Server err');
     }
 });
+
 app.get("/", function (req, res) {
-    
     let name = (typeof req.query.name === 'undefined') ? "World" : req.query.name;
     res.send(`Hello ${name}!`);
     
@@ -68,32 +75,129 @@ app.get("/", function (req, res) {
 app.get("shopping", function(req, res) {
     res.render("productPage.ejs")
 });
+
 app.get("/accounts", function (req, res) {
     res.send("Welcome to another page!")
-})
+});
+
 app.get("/productPage", function (req, res) {
     res.render('productPage')
-})
-app.get("/shoppingCart", function (req, res){
-    res.render('shoppingCart')
-})
+});
+
+app.get("/shoppingCart", function (req, res) {
+    if (!req.session.cart) {
+        req.session.cart = [];
+    }
+    console.log(req.session.cart);
+    res.render('shoppingCart', { cart: req.session.cart });
+});
+
+app.get("/search", function (req, res) {
+    const searchQuery = req.query.q;
+
+    if (!searchQuery) {
+        res.render('productPage', { products: [] });
+        return;
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
+        
+        let sql = `SELECT * FROM Products WHERE Name LIKE ? OR Description LIKE ?;`;
+        let query = `%${searchQuery}%`;
+        
+        connection.query(sql, [query, query], (err, results) => {
+            if (err) throw err;
+            
+            res.render('productPage', { products: results });
+            connection.release();
+        });
+    });
+});
+
+app.use((req, res, next) => {
+    if (!req.session.cart) {
+        req.session.cart = [];
+    }
+    next();
+});
+
+app.post("/addToCart", async (req, res) => {
+    const productName = req.body.productName;
+
+    pool.getConnection(async (err, connection) => {
+        if (err) throw err;
+        const sql = "SELECT * FROM Products WHERE Name = ?";
+        connection.query(sql, [productName], (err, results) => {
+            if (err) throw err;
+            if (results.length > 0) {
+                const product = results[0];
+                if (!req.session.cart) {
+                    req.session.cart = [];
+                }
+                req.session.cart.push(product);
+                res.redirect('/productPage');
+            } else {
+                res.send("Product not found");
+            }
+            connection.release();
+        });
+    });
+});
+
+app.post("/buyNow", async (req, res) => {
+    const productName = req.body.productName;
+
+    pool.getConnection(async (err, connection) => {
+        if (err) throw err;
+        const sql = "SELECT * FROM Products WHERE Name = ?";
+        connection.query(sql, [productName], (err, results) => {
+            if (err) throw err;
+            if (results.length > 0) {
+                const product = results[0];
+                if (!req.session.cart) {
+                    req.session.cart = [];
+                }
+                req.session.cart.push(product);
+                res.redirect('/shoppingCart');
+            } else {
+                res.send("Product not found");
+            }
+            connection.release();
+        });
+    });
+});
+
+app.post("/removeFromCart", async (req, res) => {
+    const productName = req.body.productName;
+
+    if (!req.session.cart) {
+        req.session.cart = [];
+    }
+    req.session.cart = req.session.cart.filter(product => product.Name !== productName); // Removes all instances of the product
+    res.redirect('/shoppingCart');
+});
+
 app.get("/home", function (req, res){
     res.render('home.ejs')
-})
+});
+
 app.get("/login", function (req, res){
     res.render('login.ejs')
-})
+});
+
 app.get("/makeAccount", function (req, res){
     res.render('makeAccount.ejs')
-})
+});
 
 app.get("/adminLogin",function (req, res){
     res.render("adminLogin.ejs")
-})
+});
 
 app.get("/adminPage",function (req, res){
     res.render("adminPage.ejs")
-})
+});
+
 app.listen(port, function () {
     console.log(`Example app listening on port ${port}!`);
 });
