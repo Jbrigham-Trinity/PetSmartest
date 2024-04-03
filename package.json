@@ -23,5 +23,9 @@
     "express-session": "^1.18.0",
     "mysql": "^2.18.1",
     "mysql2": "^3.9.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4"
   }
 }

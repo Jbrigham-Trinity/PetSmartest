@@ -19,7 +19,13 @@
             </a>
         </div>
     </header>
-    
+    <script>
+        var button = document.getElementsByClassName("submit");
+        button.addEventListener("click", function() {
+        // Open a new page when the button is clicked
+        window.open("new_page.html", "_blank"); // Replace "new_page.html" with the URL of the page you want to open
+    });
+    </script>
     <body>
         <H1> Administrator Login </H1>
         <input type="text" name="username" placeholder="Username" class="username">
@@ -32,7 +38,7 @@
         <!-- add selectors instead of text input -->
         <br>
         <br>
-        <button type="submit">Confirm</button>
+        <button type="submit" class="submit">Confirm</button>
         <br>
         <br>
         <!-- add password logic -->
