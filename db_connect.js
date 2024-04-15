@@ -52,7 +52,7 @@ async function createUser(username, password, email, connection) {
     try {
         const result = await new Promise((resolve, reject) => {
             connection.query(
-                "INSERT into users (Username, PasswordHash, Email) VALUES (?,?,?)",
+                "INSERT into users (Custusername, PasswordHash, Email) VALUES (?,?,?)",
                 [username, password, email],
                 (error, results) => {
                     if (error) {
