@@ -52,8 +52,8 @@ async function createUser(username, password, email, connection) {
     try {
         const result = await new Promise((resolve, reject) => {
             connection.query(
-                "INSERT into users (UserID, Username, PasswordHash, Email) VALUES (?,?,?,?)",
-                [1, username, password, email],
+                "INSERT into users (Username, PasswordHash, Email) VALUES (?,?,?)",
+                [username, password, email],
                 (error, results) => {
                     if (error) {
                         reject(error); // Reject the promise if there's an error
