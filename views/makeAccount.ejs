@@ -22,22 +22,27 @@
     
     <body>
         <H1> Make an account </H1>
-        <input type="text" name="username" placeholder="Username" class="username">
-        <input type="text" name="petname" placeholder="Pet name" class="petInfo">
-        <br>
-        <br>
-        <input type="password" name="password" placeholder="Password" class="password">
-        <input type="password" name="password" placeholder="Confirm Password" class="password">
-        <br>
-        <br>
-        <input type="text" name="petBirthday" placeholder="Pet birthday" class="petInfo"> <!-- selector wheel -->
-        <input type="text" name="petSpecies" placeholder="Pet species" class="petInfo"> <!-- drop down menu -->
-        <!-- add selectors instead of text input -->
-        <br>
-        <br>
-        <button type="submit">Confirm</button>
-        <br>
 
-        <!-- add password logic -->
+        <form action="/makeAccount" method="POST">
+            <input type="text" name="username" placeholder="Username" class="username">
+            <input type="text" name="email" placeholder="Email" class="email">
+            <br>
+            <br>
+            <input type="password" name="password" placeholder="Password" class="password">
+            <input type="password" name="confirmPassword" placeholder="Confirm Password" class="password">
+            <br>
+            <br>
+            <input type="text" name="petBirthday" placeholder="Pet birthday" class="petInfo"> <!-- selector wheel -->
+            <input type="text" name="petType" placeholder="Pet type" class="petInfo"> <!-- drop down menu -->
+            <input type="text" name="petName" placeholder="Pet name" class="petInfo"> 
+
+
+            <!-- add selectors instead of text input -->
+            <br>
+            <br>
+            <button type="submit">Confirm</button>
+            <br>
+            <br>
+        </form>
     </body>
 </html>

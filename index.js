@@ -1,7 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql2');
-const Product = require('./db_connect');
+const { Product, createUser, verifyUserAccount} = require('./db_connect');
 const dotenv = require('dotenv');
 
 const app = express();
@@ -15,6 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs')
 
 app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true })); // Parse request body
 
 const pool = mysql.createPool({
     host: process.env.DATABASE_HOST,
@@ -40,8 +41,10 @@ app.get("/productPage", async function (req, res) {
             if (err) {
                 console.error('Error connecting to database:', err);
                 return;
+
             }
             
+
             const productInstance = Product.getProductInstance();
             productInstance.getProductData(connection)
                 .then(products => {
@@ -184,20 +187,76 @@ app.get("/home", function (req, res){
 
 app.get("/login", function (req, res){
     res.render('login.ejs')
-});
+
+})
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    try{
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database:', err);
+                return;
+            }
+            verifyUserAccount(username, password, connection)
+                .then(user => {
+                    if (user) {
+                        res.send('Login successful');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error verifying user account:', error);
+                    res.status(401).send('Invalid username or password');
+                })
+                .finally(() => {
+                    connection.release();
+                });
+        });
+    } catch (error) {
+        console.error('Error processing login request:', error);
+        res.status(500).send('Internal Server Error');
+    }
+})
 
 app.get("/makeAccount", function (req, res){
     res.render('makeAccount.ejs')
-});
+})
+app.post('/makeAccount', async (req, res) => {
+    const { username, password, confirmPassword, email } = req.body;
 
-app.get("/adminLogin",function (req, res){
-    res.render("adminLogin.ejs")
-});
+    if (password === '' | username === '' | email === '') {
+        return res.status(400).send('Please fill in all information');
+    }
+    if (password !== confirmPassword){
+        return res.status(400).send('Password and Confirm Password do not match');
+    }
+    try {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database:', err);
+                return;
+            }
+            console.log(`MySQL Connected to create user account`);
+            createUser(username, password, email, connection)
+            .then(results => {
+                if (results) {
+                    res.send('User Created Successfully');
+                }
+            })
+            .catch(error => {
+                console.error('Error creating account:', error);
+                res.status(401).send('Error creating account');
+            })
+            .finally(() => {
+                connection.release();
+            });
+         });
 
-app.get("/adminPage",function (req, res){
-    res.render("adminPage.ejs")
-});
 
+    } catch (error) {
+        console.error('Error creating user:', error);
+        res.status(500).send('Error creating user');   
+    }
+})
 app.listen(port, function () {
     console.log(`Example app listening on port ${port}!`);
 });
