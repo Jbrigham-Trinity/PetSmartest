@@ -73,6 +73,8 @@ app.get("/", function (req, res) {
     res.render('shoppingCart')
     res.render('login')
     res.render('makeAccount')
+    res.render('reviewPage')
+    res.render('checkout')
 });
 
 app.get("shopping", function(req, res) {
@@ -85,6 +87,9 @@ app.get("/accounts", function (req, res) {
 
 app.get("/productPage", function (req, res) {
     res.render('productPage')
+});
+app.get("/checkout", function (req, res) {
+    res.render('checkout')
 });
 
 app.get("/shoppingCart", function (req, res) {
@@ -180,6 +185,36 @@ app.post("/removeFromCart", async (req, res) => {
     req.session.cart = req.session.cart.filter(product => product.Name !== productName); // Removes all instances of the product
     res.redirect('/shoppingCart');
 });
+
+app.post("/checkout", async (req, res) => {
+    if (!req.session.cart) {
+        req.session.cart = [];
+    }
+    req.session.cart = [];
+    res.redirect('/shoppingCart');
+});
+app.get("/reviewPage", function (req, res) {
+    res.render('reviewPage')
+});
+// app.post("/reviewPage", async (req, res) => {
+//     // const productName = req.query.productName;
+//     redirect('/reviewPage')
+
+//     // pool.getConnection(async (err, connection) => {
+//     //     if (err) throw err;
+//     //     const sql = "SELECT * FROM Reviews WHERE Name = ?";
+//     //     connection.query(sql, [productName], (err, results) => {
+//     //         if (err) throw err;
+//     //         if (results.length > 0) {
+//     //             const reviews = results;
+//     //             res.render('reviewPage', { reviews });
+//     //         } else {
+//     //             res.send("No reviews found for this product");
+//     //         }
+//     //         connection.release();
+//     //     });
+//     // });
+// });
 
 app.get("/home", function (req, res){
     res.render('home.ejs')
