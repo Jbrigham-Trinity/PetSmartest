@@ -32,7 +32,7 @@
     <nav>
         <button class="nav-button">FOOD</button>
         <button class="nav-button">TOYS</button>
-        <button class="nav-button">ACCESORIES</button>
+        <button class="nav-button">ACCESSORIES</button>
         <button class="nav-button">HEALTH</button>
         <button class="nav-button">SERVICES</button>
         <button class="nav-button">BRANDS</button>
@@ -45,14 +45,28 @@
         <div class="product-grid">
             <% products.forEach(function(products) { %>
                 <div class="products">
-                    <img src="<%= products.Image %>" alt="Product Image">
-                    <h2><%= products.Name %></h2>
-                    <p><%= products.Description %></p>
-                    <p>Price: <%= products.Price %></p>
-                    <!-- Add any additional product details here -->
-                    <button>Add to Cart</button>
-                    <button>Buy Now</button>
-                    <button>View Reviews</button>
+                    <img src="<%= products.ImageURL %>" alt="Product Image">
+                    <div class="product-info">
+                        <h2><%= products.Name %></h2>
+                        <p><%= products.Description %></p>
+                        <p>Price: $<%= products.Price %></p>
+                        <!-- Add any additional product details here -->
+                        <div class="product-buttons">
+                            <form action="/addToCart" method="post">
+                                <input type="hidden" name="productName" value="<%= products.Name %>">
+                                <button type="submit">Add to Cart</button>
+                            </form>
+                            
+                            <form action="/buyNow" method="post">
+                                <input type="hidden" name="productName" value="<%= products.Name %>">
+                                <button type="submit">Buy Now</button>
+                            </form>
+                            <form action="/reviews" method="post">
+                                <input type="hidden" name="productName" value="<%= products.Name %>">
+                                <button type="submit">View Reviews</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             <% }); %>
         </div>
