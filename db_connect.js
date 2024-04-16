@@ -27,10 +27,10 @@ class Product {
 	}
 }
 
-async function verifyUserAccount(username, password, connection) {
+async function verifyUserAccount(custusername, password, connection) {
     try {
         return new Promise((resolve, reject) => {
-            connection.query('SELECT * FROM users WHERE Username = ? AND PasswordHash = ?', [username, password], 
+            connection.query('SELECT * FROM users WHERE Custusername = ? AND PasswordHash = ?', [custusername, password], 
             (error, results) => {
                 if (error) {
                     reject(error);
@@ -73,5 +73,52 @@ async function createUser(username, password, email, connection) {
         connection.release(); // Release the database connection
     }
 }
-module.exports = { Product, createUser, verifyUserAccount };
+
+async function verifyAdminAccount(adminusername, password, connection) {
+    try {
+        return new Promise((resolve, reject) => {
+            connection.query('SELECT * FROM admins WHERE AdminUserName = ? AND PasswordHash = ?', [adminusername, password], 
+            (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    if (results.length === 0) {
+                        reject(new Error('Invalid username or password.'));
+                    } else {
+                        resolve(results);
+                    }
+                }
+            });
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function createAdmin(adminusername, password, email, connection) {
+    try {
+        const result = await new Promise((resolve, reject) => {
+            connection.query(
+                "INSERT into users (AdminUserName, PasswordHash, Email) VALUES (?,?,?)",
+                [adminusername, password, email],
+                (error, results) => {
+                    if (error) {
+                        reject(error); // Reject the promise if there's an error
+                    } else {
+                        resolve(results); // Resolve the promise with the query results
+                    }
+                }
+            );
+        });
+
+        console.log('Administrator inserted successfully');
+        return { success: true }; // Indication of success
+    } catch (error) {
+        console.error('Error creating administrator', error);
+        throw error; // Rethrow the error
+    } finally {
+        connection.release(); // Release the database connection
+    }
+}
+module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount };
 
