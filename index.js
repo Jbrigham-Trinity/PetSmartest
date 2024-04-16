@@ -1,7 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql2');
-const { Product, createUser, verifyUserAccount} = require('./db_connect');
+const { Product, createUser, verifyUserAccount, verifyAdminAccount} = require('./db_connect');
 const dotenv = require('dotenv');
 
 const app = express();
@@ -39,12 +39,10 @@ app.get("/productPage", async function (req, res) {
     try {
         pool.getConnection((err, connection) => {
             if (err) {
-                console.error('Error connecting to database:', err);
+                console.error('Error connecting to database for product page:', err);
                 return;
 
             }
-            
-
             const productInstance = Product.getProductInstance();
             productInstance.getProductData(connection)
                 .then(products => {
@@ -205,6 +203,37 @@ app.post('/login', async (req, res) => {
                 })
                 .catch(error => {
                     console.error('Error verifying user account:', error);
+                    res.status(401).send('Invalid username or password');
+                })
+                .finally(() => {
+                    connection.release();
+                });
+        });
+    } catch (error) {
+        console.error('Error processing login request:', error);
+        res.status(500).send('Internal Server Error');
+    }
+})
+app.get("/adminLogin", function (req, res){
+    res.render('adminLogin.ejs')
+
+})
+app.post('/adminLogin', async (req, res) => {
+    const { username, password } = req.body;
+    try{
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database:', err);
+                return;
+            }
+            verifyAdminAccount(username, password, connection)
+                .then(admin => {
+                    if (admin) {
+                        res.render('adminPage');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error verifying admin account:', error);
                     res.status(401).send('Invalid username or password');
                 })
                 .finally(() => {
