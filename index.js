@@ -1,7 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql2');
-const { Product, createUser, verifyUserAccount, verifyAdminAccount} = require('./db_connect');
+const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity} = require('./db_connect');
 const dotenv = require('dotenv');
 
 const app = express();
