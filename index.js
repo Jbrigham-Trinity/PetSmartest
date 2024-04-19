@@ -249,6 +249,38 @@ app.post('/adminLogin', async (req, res) => {
 app.get("/makeAccount", function (req, res){
     res.render('makeAccount.ejs')
 })
+app.get("/adminpage", function (req, res) {
+    res.render("adminPage.ejs")
+})
+app.get("/adminAddProducts", function (req, res) {
+    res.render("adminAddProducts.ejs")
+})
+app.get("/adminSubProducts", function (req, res) {
+    try {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database for admin remove product page:', err);
+                return;
+
+            }
+            const productInstance = Product.getProductInstance();
+            productInstance.getProductData(connection)
+                .then(products => {
+                    res.render('adminSubProducts', { products });
+                })
+                .catch(error => {
+                    console.error('Error fetching product data:', error);
+                    res.status(500).send('Internal Server err');
+                })
+                .finally(() => {
+                    connection.release();
+                });
+        });
+    } catch (error) {
+        console.error('Error fetching product data:', error);
+        res.status(500).send('Internal Server err');
+    }
+})
 app.post('/makeAccount', async (req, res) => {
     const { username, password, confirmPassword, email } = req.body;
 
