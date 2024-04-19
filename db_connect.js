@@ -120,5 +120,48 @@ async function createAdmin(adminusername, password, email, connection) {
         connection.release(); // Release the database connection
     }
 }
-module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount };
+
+async function updateProductQuantity(product, buy_quantity, connection){
+    try {
+        const currentStock = await new Promise((resolve, reject) => {
+            connection.query(
+                'SELECT StockQuantity FROM products WHERE Name = ?', [product],
+                (error, results) => {
+                    if (error) {
+                        reject(error); 
+                    } else {
+                        resolve(results); 
+                    }
+                }
+            );
+        });
+
+        const newStock = currentStock - buy_quantity;
+        if (newStock < 0) {
+            throw new Error('Insufficient stock'); 
+        }
+
+        await new Promise((resolve, reject) => {
+            connection.query(
+                'UPDATE products SET StockQuantity = ? WHERE Name = ?',[newStock, product],
+                (error, results) => {
+                    if (error) {
+                        reject(error); 
+                    } else {
+                        resolve(); // Resolve the promise if the update is successful
+                    }
+                }
+            );
+        });
+
+        console.log('Purchase has been registered');
+        return { success: true }; // Indication of success
+    } catch (error) {
+        console.error('Error purchasing product', error);
+        throw error; // Rethrow the error
+    } finally {
+        connection.release(); // Release the database connection
+    }
+}
+module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity };
 
