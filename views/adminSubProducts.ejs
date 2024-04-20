@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles/header.css">
+    
+    <header>
+        <div class="logo">
+            <a href="adminPage" class="icon-link">
+                <!-- <i class="fas fa-home"></i> -->
+                <img src="assets/tinyDog.png">
+            </a>
+        </div>
+        <div class="right-icons">
+            <a href="login" class="icon-link">
+                <i class="fas fa-user fa-2x"></i>
+            </a>
+        </div>
+    </header>
+    
+    <body>
+        <H1>Select an item to remove.</H1>
+        <a href="adminpage">
+            <button > Return to previous page</button>
+        </a>
+        
+        <div class="product-grid">
+            <% products.forEach(function(products) { %>
+                <div class="products">
+                    <img src="<%= products.ImageURL %>" alt="Product Image">
+                    <div class="product-info">
+                        <h2><%= products.Name %></h2>
+                        <p><%= products.Description %></p>
+                        <p>Price: $<%= products.Price %></p>
+                        <!-- Add any additional product details here -->
+                        <div class="product-buttons">
+                            
+                            
+                            <form action="/buyNow" method="post">
+                                <input type="hidden" name="productName" value="">
+                                <button type="submit">Remove</button>
+                            </form>
+                            <form action="/buyNow" method="post">
+                                <input type="hidden" name="productName" value="">
+                                <button type="submit">Remove All</button>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+        
+        <!--
+        <H1> Administrator Login </H1>
+        <input type="text" name="username" placeholder="Username" class="username">
+        <br>
+        <br>
+        <input type="password" name="password" placeholder="Password" class="password">
+        <input type="email" name="email" placeholder="email" class="email">
+        <br>
+        <br>
+        <br>
+        <br>
+        <button type="submit">Confirm</button>
+        <br>
+        <br>
+        -->
+        
+    </body>
+</html>

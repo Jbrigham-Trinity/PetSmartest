@@ -1,7 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql2');
-const { Product, createUser, verifyUserAccount} = require('./db_connect');
+const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity} = require('./db_connect');
 const dotenv = require('dotenv');
 
 const app = express();
@@ -39,12 +39,10 @@ app.get("/productPage", async function (req, res) {
     try {
         pool.getConnection((err, connection) => {
             if (err) {
-                console.error('Error connecting to database:', err);
+                console.error('Error connecting to database for product page:', err);
                 return;
 
             }
-            
-
             const productInstance = Product.getProductInstance();
             productInstance.getProductData(connection)
                 .then(products => {
@@ -251,6 +249,37 @@ app.post('/login', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 })
+app.get("/adminLogin", function (req, res){
+    res.render('adminLogin.ejs')
+
+})
+app.post('/adminLogin', async (req, res) => {
+    const { username, password } = req.body;
+    try{
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database:', err);
+                return;
+            }
+            verifyAdminAccount(username, password, connection)
+                .then(admin => {
+                    if (admin) {
+                        res.render('adminPage');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error verifying admin account:', error);
+                    res.status(401).send('Invalid username or password');
+                })
+                .finally(() => {
+                    connection.release();
+                });
+        });
+    } catch (error) {
+        console.error('Error processing login request:', error);
+        res.status(500).send('Internal Server Error');
+    }
+})
 
 app.post('/FOOD', function (req, res){
     const category = "food";
@@ -431,6 +460,38 @@ app.post('/ALL', function (req, res){
 
 app.get("/makeAccount", function (req, res){
     res.render('makeAccount.ejs')
+})
+app.get("/adminpage", function (req, res) {
+    res.render("adminPage.ejs")
+})
+app.get("/adminAddProducts", function (req, res) {
+    res.render("adminAddProducts.ejs")
+})
+app.get("/adminSubProducts", function (req, res) {
+    try {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database for admin remove product page:', err);
+                return;
+
+            }
+            const productInstance = Product.getProductInstance();
+            productInstance.getProductData(connection)
+                .then(products => {
+                    res.render('adminSubProducts', { products });
+                })
+                .catch(error => {
+                    console.error('Error fetching product data:', error);
+                    res.status(500).send('Internal Server err');
+                })
+                .finally(() => {
+                    connection.release();
+                });
+        });
+    } catch (error) {
+        console.error('Error fetching product data:', error);
+        res.status(500).send('Internal Server err');
+    }
 })
 app.post('/makeAccount', async (req, res) => {
     const { username, password, confirmPassword, email } = req.body;
