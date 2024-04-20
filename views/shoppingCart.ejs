@@ -28,16 +28,30 @@
     </header>
     
     <nav>
-        <button class="nav-button">FOOD</button>
-        <button class="nav-button">TOYS</button>
-        <button class="nav-button">ACCESSORIES</button>
-        <button class="nav-button">HEALTH</button>
-        <button class="nav-button">SERVICES</button>
-        <button class="nav-button">BRANDS</button>
-        <button class="nav-button">SALE</button>
-        <button class="nav-button">NEW</button>
-        <button class="nav-button">HELP</button>
-        <button class="nav-button">FAQS</button>
+        <form action="/FOOD" method="post">
+            <button class="nav-button" name="FOOD">FOOD</button>
+        </form>
+        <form action="/TOYS" method="post">
+            <button class="nav-button" name="TOYS">TOYS</button>
+        </form>
+        <form action="/ACCESSORIES" method="post">
+            <button class="nav-button" name="ACCESSORIES">ACCESSORIES</button>
+        </form>
+        <form action="/HEALTH" method="post">
+            <button class="nav-button" name="HEALTH">HEALTH</button>
+        </form>
+        <form action="/DOGS" method="post">
+            <button class="nav-button" name="DOGS">DOGS</button>
+        </form>
+        <form action="/CATS" method="post">
+            <button class="nav-button" name="CATS">CATS</button>
+        </form>
+        <form action="/FISH" method="post">
+            <button class="nav-button" name="FISH">FISH</button>
+        </form>
+        <form action="/ALL" method="post">
+            <button class="nav-button" name="ALL">ALL PETS</button>
+        </form>
     </nav>
     <body>
         <div class="product-grid">
@@ -66,6 +80,7 @@
         <div class="total">
             <h2>Total: $<span id="totalAmount"></span></h2> <!-- Updated dynamically by JavaScript -->
         </div>
+
         <form action="/checkout" method="post">
             <button type="submit">Checkout</button>
         </form>
@@ -94,5 +109,6 @@
             document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
         }
     </script>
+
     </body>
 </html>

@@ -71,6 +71,8 @@ app.get("/", function (req, res) {
     res.render('shoppingCart')
     res.render('login')
     res.render('makeAccount')
+    res.render('reviewPage')
+    res.render('checkout')
 });
 
 app.get("shopping", function(req, res) {
@@ -83,6 +85,9 @@ app.get("/accounts", function (req, res) {
 
 app.get("/productPage", function (req, res) {
     res.render('productPage')
+});
+app.get("/checkout", function (req, res) {
+    res.render('checkout')
 });
 
 app.get("/shoppingCart", function (req, res) {
@@ -179,6 +184,36 @@ app.post("/removeFromCart", async (req, res) => {
     res.redirect('/shoppingCart');
 });
 
+app.post("/checkout", async (req, res) => {
+    if (!req.session.cart) {
+        req.session.cart = [];
+    }
+    req.session.cart = [];
+    res.redirect('/shoppingCart');
+});
+app.get("/reviewPage", function (req, res) {
+    res.render('reviewPage')
+});
+// app.post("/reviewPage", async (req, res) => {
+//     // const productName = req.query.productName;
+//     redirect('/reviewPage')
+
+//     // pool.getConnection(async (err, connection) => {
+//     //     if (err) throw err;
+//     //     const sql = "SELECT * FROM Reviews WHERE Name = ?";
+//     //     connection.query(sql, [productName], (err, results) => {
+//     //         if (err) throw err;
+//     //         if (results.length > 0) {
+//     //             const reviews = results;
+//     //             res.render('reviewPage', { reviews });
+//     //         } else {
+//     //             res.send("No reviews found for this product");
+//     //         }
+//     //         connection.release();
+//     //     });
+//     // });
+// });
+
 app.get("/home", function (req, res){
     res.render('home.ejs')
 });
@@ -245,6 +280,183 @@ app.post('/adminLogin', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 })
+
+app.post('/FOOD', function (req, res){
+    const category = "food";
+
+    if (!category) {
+        res.render('productPage', { products: [] });
+        return;
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
+        
+        let sql = `SELECT * FROM Products WHERE Category = ?;`;
+        
+        connection.query(sql, [category], (err, results) => {
+            if (err) throw err;
+            
+            res.render('productPage', { products: results });
+            connection.release();
+        });
+    });
+}) 
+
+app.post('/TOYS', function (req, res){
+    const category = "toys";
+
+    if (!category) {
+        res.render('productPage', { products: [] });
+        return;
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
+        
+        let sql = `SELECT * FROM Products WHERE Category = ?;`;
+        
+        connection.query(sql, [category], (err, results) => {
+            if (err) throw err;
+            
+            res.render('productPage', { products: results });
+            connection.release();
+        });
+    });
+}) 
+
+app.post('/ACCESSORIES', function (req, res){
+    const category = "accessories";
+
+    if (!category) {
+        res.render('productPage', { products: [] });
+        return;
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
+        
+        let sql = `SELECT * FROM Products WHERE Category = ?;`;
+        
+        connection.query(sql, [category], (err, results) => {
+            if (err) throw err;
+            
+            res.render('productPage', { products: results });
+            connection.release();
+        });
+    });
+}) 
+
+app.post('/HEALTH', function (req, res){
+    const category = "health";
+
+    if (!category) {
+        res.render('productPage', { products: [] });
+        return;
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
+        
+        let sql = `SELECT * FROM Products WHERE Category = ?;`;
+        
+        connection.query(sql, [category], (err, results) => {
+            if (err) throw err;
+            
+            res.render('productPage', { products: results });
+            connection.release();
+        });
+    });
+}) 
+
+app.post('/DOGS', function (req, res){
+    const category = "dog";
+
+    if (!category) {
+        res.render('productPage', { products: [] });
+        return;
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
+        
+        let sql = `SELECT * FROM Products WHERE AnimalType = ?;`;
+        
+        connection.query(sql, [category], (err, results) => {
+            if (err) throw err;
+            
+            res.render('productPage', { products: results });
+            connection.release();
+        });
+    });
+}) 
+
+app.post('/CATS', function (req, res){
+    const category = "cat";
+
+    if (!category) {
+        res.render('productPage', { products: [] });
+        return;
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
+        
+        let sql = `SELECT * FROM Products WHERE AnimalType = ?;`;
+        
+        connection.query(sql, [category], (err, results) => {
+            if (err) throw err;
+            
+            res.render('productPage', { products: results });
+            connection.release();
+        });
+    });
+}) 
+
+app.post('/FISH', function (req, res){
+    const category = "fish";
+    const all = "All Pets"
+
+    if (!category) {
+        res.render('productPage', { products: [] });
+        return;
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
+        
+        let sql = `SELECT * FROM Products WHERE AnimalType = ?;`;
+        
+        connection.query(sql, [category || all], (err, results) => {
+            if (err) throw err;
+            
+            res.render('productPage', { products: results });
+            connection.release();
+        });
+    });
+}) 
+app.post('/ALL', function (req, res){
+    const category = "All Pets"
+
+    if (!category) {
+        res.render('productPage', { products: [] });
+        return;
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
+        
+        let sql = `SELECT * FROM Products WHERE AnimalType = ?;`;
+        
+        connection.query(sql, [category || all], (err, results) => {
+            if (err) throw err;
+            
+            res.render('productPage', { products: results });
+            connection.release();
+        });
+    });
+}) 
+
 
 app.get("/makeAccount", function (req, res){
     res.render('makeAccount.ejs')

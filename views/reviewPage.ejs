@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles/header.css">
     
     <header>
         <div class="logo">
-            <a href="home" class="icon-link">
-                <!-- <i class="fas fa-home"></i> -->
+            <a href="productPage" class="icon-link">
                 <img src="assets/tinyDog.png">
             </a>
         </div>
@@ -55,36 +53,14 @@
             <button class="nav-button" name="ALL">ALL PETS</button>
         </form>
     </nav>
-
     <body>
-        <div class="product-grid">
-            <% products.forEach(function(products) { %>
-                <div class="products">
-                    <img src="<%= products.ImageURL %>" alt="Product Image">
-                    <div class="product-info">
-                        <h2><%= products.Name %></h2>
-                        <p><%= products.Description %></p>
-                        <p>Price: $<%= products.Price %></p>
-                        <!-- Add any additional product details here -->
-                        <div class="product-buttons">
-                            <form action="/addToCart" method="post">
-                                <input type="hidden" name="productName" value="<%= products.Name %>">
-                                <button type="submit">Add to Cart</button>
-                            </form>
-                            
-                            <form action="/buyNow" method="post">
-                                <input type="hidden" name="productName" value="<%= products.Name %>">
-                                <button type="submit">Buy Now</button>
-                            </form>
-                            <form action="/reviewPage" method="post">
-                                <input type="hidden" name="productName" value="<%= products.Name %>">
-                                <button type="submit">View Reviews</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+        <div class="review-list">
+            <h2>Reviews</h2>
+            <ul>
+            <% reviews.forEach(function(review) { %>
+                <li><%= review %></li>
             <% }); %>
+            </ul>
         </div>
-    
     </body>
 </html>
