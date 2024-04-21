@@ -1,9 +1,9 @@
 const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql2');
-const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity, addnewProduct} = require('./db_connect');
+const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity, addnewProduct, productrecommendation, requireLogin, requireAdminLogin} = require('./db_connect');
 const dotenv = require('dotenv');
-
+const store = new session.MemoryStore();
 const app = express();
 const port = 3000;
 dotenv.config();
@@ -32,16 +32,17 @@ app.use(session({
 }));
 
 app.get("/", function (req, res) {
+    console.log(req.session.isLoggedIn);
     res.render('home');
+
 });
 
-app.get("/productPage", async function (req, res) {
+app.get("/productPage", requireLogin, async function (req, res) {
     try {
         pool.getConnection((err, connection) => {
             if (err) {
                 console.error('Error connecting to database for product page:', err);
                 return;
-
             }
             const productInstance = Product.getProductInstance();
             productInstance.getProductData(connection)
@@ -83,14 +84,11 @@ app.get("/accounts", function (req, res) {
     res.send("Welcome to another page!")
 });
 
-app.get("/productPage", function (req, res) {
-    res.render('productPage')
-});
-app.get("/checkout", function (req, res) {
-    res.render('checkout')
+app.get("/checkout", requireLogin, function (req, res) {
+    res.render('checkout', { cart: req.session.cart })
 });
 
-app.get("/shoppingCart", function (req, res) {
+app.get("/shoppingCart", requireLogin, function (req, res) {
     if (!req.session.cart) {
         req.session.cart = [];
     }
@@ -98,7 +96,7 @@ app.get("/shoppingCart", function (req, res) {
     res.render('shoppingCart', { cart: req.session.cart });
 });
 
-app.get("/search", function (req, res) {
+app.get("/search", requireLogin, function (req, res) {
     const searchQuery = req.query.q;
 
     if (!searchQuery) {
@@ -115,7 +113,7 @@ app.get("/search", function (req, res) {
         connection.query(sql, [query, query], (err, results) => {
             if (err) throw err;
             
-            res.render('productPage', { products: results });
+            res.render('productPage', { products: results});
             connection.release();
         });
     });
@@ -127,6 +125,12 @@ app.use((req, res, next) => {
     }
     next();
 });
+app.use((req, res, next) => {
+    res.locals.user = req.session.user;
+    res.locals.admin = req.session.admin;
+    next();
+});
+
 
 app.post("/addToCart", async (req, res) => {
     const productName = req.body.productName;
@@ -188,11 +192,40 @@ app.post("/checkout", async (req, res) => {
     if (!req.session.cart) {
         req.session.cart = [];
     }
-    req.session.cart = [];
-    res.redirect('/shoppingCart');
+    const {productIDList, quantitiesList} = req.body;
+    try {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database:', err);
+                return;
+            }
+            for (let i = 0; i < productIDList.length; i++) {
+                const productID = productIDList[i];
+                const quantity = quantitiesList[i];
+                console.log(quantity);
+                updateProductQuantity(productID, quantity, connection)
+                .then(results => {
+                    if (results) {
+                        console.log("success");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error buying:', error);
+                    res.status(401).send('Error buying');
+                })
+                .finally(() => {
+                    connection.release();
+                });
+            }
+        });
+    } catch (error) {
+        console.error('Error removing product:', error);
+    }
+
+    res.redirect('/checkout');
 });
-app.get("/reviewPage", function (req, res) {
-    res.render('reviewPage')
+app.get("/reviewPage", requireLogin, function (req, res) {
+    res.render('reviewPage' )
 });
 // app.post("/reviewPage", async (req, res) => {
 //     // const productName = req.query.productName;
@@ -219,7 +252,7 @@ app.get("/home", function (req, res){
 });
 
 app.get("/login", function (req, res){
-    res.render('login.ejs')
+    res.render('login.ejs', { user : req.session.user })
 
 })
 app.post('/login', async (req, res) => {
@@ -235,14 +268,12 @@ app.post('/login', async (req, res) => {
                     if (user) {
                         req.session.user = user;  // Set user info in session
                         req.session.isLoggedIn = true; // Set the login flag
-                        res.redirect('/productPage');
-                    } else {
-                        res.status(401).send('Invalid username or password');
-                    }
+                        return res.json({ success: true });   
+                    } 
                 })
                 .catch(error => {
                     console.error('Error verifying user account:', error);
-                    res.status(401).send('Invalid username or password');
+                    return res.json({ success: false });   
                 })
                 .finally(() => {
                     connection.release();
@@ -471,10 +502,10 @@ app.post('/ALL', function (req, res){
 app.get("/makeAccount", function (req, res){
     res.render('makeAccount.ejs')
 })
-app.get("/adminPage", function (req, res) {
+app.get("/adminPage", requireAdminLogin, function (req, res) {
     res.render("adminPage.ejs")
 })
-app.get("/adminAddProducts", function (req, res) {
+app.get("/adminAddProducts", requireAdminLogin, function (req, res) {
     res.render("adminAddProducts.ejs")
 })
 app.post('/adminAdd', async(req,res) => {
@@ -504,7 +535,7 @@ app.post('/adminAdd', async(req,res) => {
         console.error('Error removing product:', error);
     }
 })
-app.get("/adminSubProducts", function (req, res) {
+app.get("/adminSubProducts", requireAdminLogin, function (req, res) {
     try {
         pool.getConnection((err, connection) => {
             if (err) {
