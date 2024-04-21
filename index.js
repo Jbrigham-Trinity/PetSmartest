@@ -224,7 +224,7 @@ app.get("/login", function (req, res){
 })
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    try{
+    try {
         pool.getConnection((err, connection) => {
             if (err) {
                 console.error('Error connecting to database:', err);
@@ -233,7 +233,11 @@ app.post('/login', async (req, res) => {
             verifyUserAccount(username, password, connection)
                 .then(user => {
                     if (user) {
-                        res.send('Login successful');
+                        req.session.user = user;  // Set user info in session
+                        req.session.isLoggedIn = true; // Set the login flag
+                        res.redirect('/productPage');
+                    } else {
+                        res.status(401).send('Invalid username or password');
                     }
                 })
                 .catch(error => {
@@ -248,14 +252,15 @@ app.post('/login', async (req, res) => {
         console.error('Error processing login request:', error);
         res.status(500).send('Internal Server Error');
     }
-})
+});
+
 app.get("/adminLogin", function (req, res){
     res.render('adminLogin.ejs')
 
 })
 app.post('/adminLogin', async (req, res) => {
     const { username, password } = req.body;
-    try{
+    try {
         pool.getConnection((err, connection) => {
             if (err) {
                 console.error('Error connecting to database:', err);
@@ -264,7 +269,11 @@ app.post('/adminLogin', async (req, res) => {
             verifyAdminAccount(username, password, connection)
                 .then(admin => {
                     if (admin) {
-                        res.render('adminPage');
+                        req.session.admin = admin;  // Set admin info in session
+                        req.session.isAdminLoggedIn = true; // Set the admin login flag
+                        res.redirect('/adminPage');  // Redirect to the admin page
+                    } else {
+                        res.status(401).send('Invalid username or password');
                     }
                 })
                 .catch(error => {
@@ -276,10 +285,11 @@ app.post('/adminLogin', async (req, res) => {
                 });
         });
     } catch (error) {
-        console.error('Error processing login request:', error);
+        console.error('Error processing admin login request:', error);
         res.status(500).send('Internal Server Error');
     }
-})
+});
+
 
 app.post('/FOOD', function (req, res){
     const category = "food";
@@ -461,7 +471,7 @@ app.post('/ALL', function (req, res){
 app.get("/makeAccount", function (req, res){
     res.render('makeAccount.ejs')
 })
-app.get("/adminpage", function (req, res) {
+app.get("/adminPage", function (req, res) {
     res.render("adminPage.ejs")
 })
 app.get("/adminAddProducts", function (req, res) {
@@ -571,7 +581,7 @@ app.post('/makeAccount', async (req, res) => {
             createUser(username, password, email, connection)
             .then(results => {
                 if (results) {
-                    res.send('User Created Successfully');
+                    res.redirect('/login');
                 }
             })
             .catch(error => {
