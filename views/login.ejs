@@ -22,7 +22,7 @@
     
     <body>
         <H1> Login in </H1>
-        <form action="/login" method="POST">
+        <form action="/login" method="POST" onsubmit="return handleLogin(event)">
             <input type="text" name="username" placeholder="Username" class="username">
             <br>
             <br>
@@ -36,6 +36,31 @@
         <a href="makeAccount">New user?</a>
         <br>
         <a href="adminLogin">Admin Login</a>
-        <!-- add password logic -->
+        <script>
+            async function handleLogin(event) {
+                event.preventDefault(); 
+                const username = document.querySelector('.username').value;
+                const password = document.querySelector('.password').value;
+
+                try {
+                    const response = await fetch('/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password }),
+                    });
+
+                    const data = await response.json(); // Parse JSON response
+                    if(data.success){
+                        alert("Successfully Login");
+                        window.location.href = '/productPage';
+                    } else {
+                        alert("Please try again. Incorrect Username or Password");
+                        window.location.href = '/login'; // Redo on fail
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        </script>
     </body>
 </html>

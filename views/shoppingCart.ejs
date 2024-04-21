@@ -78,13 +78,12 @@
             <% }); %>
         </div>
         <div class="total">
-            <h2>Total: $<span id="totalAmount"></span></h2> <!-- Updated dynamically by JavaScript -->
+            <h2>Total: $<span id="totalAmount"></span><h2> <!-- Updated dynamically by JavaScript -->
         </div>
 
-        <form action="/checkout" method="post">
-            <button type="submit">Checkout</button>
-        </form>
-
+        <a href="checkOut">
+            <button href="checkOut"> Checkout</button>
+        </a>
         <script>
             window.addEventListener('load', function() {
                 updateTotal(); // Calculate the initial total when the page loads

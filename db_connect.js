@@ -188,6 +188,88 @@ async function addnewProduct(productname, category, description, price, quantity
         connection.release(); 
     }
 }
+async function productrecommendation(username, productID, connection) {
+    try {
+        const alreadyrecommended = await new Promise((resolve, reject) => {
+            connection.query(
+                "SELECT * FROM users WHERE Custusername = ? AND ProductID = ?",
+                [username, productID],
+                (error, results) => {
+                    if (error) {
+                        reject(error); 
+                    } else {
+                        resolve(results.length > 0); 
+                    }
+                }
+            );
+        });
 
-module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity, addnewProduct };
+        if (alreadyrecommended) {
+            console.log('User already has been recommended product');
+        } else {
+            await new Promise((resolve, reject) => {
+                connection.query(
+                    "INSERT into productrecommendations (Custusername, ProductID) VALUES (?,?)",
+                    [username, productID],
+                    (error, results) => {
+                        if (error) {
+                            reject(error); 
+                        } else {
+                            console.log('Recommendation updated');
+                            resolve(); 
+                        }
+                    }
+                );
+            });
+        }
+    } catch (error) {
+        console.error('Error recommending product', error);
+        throw error; 
+    } finally {
+        connection.release();
+    }
+}
+
+async function audit(operation, username, accounttype, productid, detail, connection) {
+    try {
+        const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+        const result = await new Promise((resolve, reject) => {
+            connection.query(
+                "INSERT into audit_trail (OperationType, Timestamp, Username, AccountType, ProductID, Detail) VALUES (?,?,?,?,?,?)",
+                [operation, timestamp, username, accounttype, productid, detail],
+                (error, results) => {
+                    if (error) {
+                        reject(error); 
+                    } else {
+                        console.log("audit updated");
+                        resolve(); 
+                    }
+                }
+            );
+        });
+
+    } catch (error) {
+        console.error('Error updating audit', error);
+        throw error; 
+    } finally {
+        connection.release(); 
+    }
+}
+function requireLogin(req, res, next) {
+    if (req.session.isLoggedIn || req.session.isAdminLoggedIn) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+}
+
+function requireAdminLogin(req, res, next) {
+    if (req.session.isAdminLoggedIn) {
+        next();
+    } else {
+        res.redirect('/adminLogin');
+    }
+}
+module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity, addnewProduct, productrecommendation, requireLogin, requireAdminLogin };
 
