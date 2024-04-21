@@ -529,7 +529,6 @@ app.post('/adminUpdate', async(req,res) =>{
                 console.error('Error connecting to database:', err);
                 return;
             }
-            console.log(action);
             if(action === 'add'){
                 adjustedQuantity = -quantity;
             }
