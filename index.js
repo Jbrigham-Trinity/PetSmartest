@@ -227,25 +227,26 @@ app.post("/checkout", async (req, res) => {
 app.get("/reviewPage", requireLogin, function (req, res) {
     res.render('reviewPage' )
 });
-// app.post("/reviewPage", async (req, res) => {
-//     // const productName = req.query.productName;
-//     redirect('/reviewPage')
 
-//     // pool.getConnection(async (err, connection) => {
-//     //     if (err) throw err;
-//     //     const sql = "SELECT * FROM Reviews WHERE Name = ?";
-//     //     connection.query(sql, [productName], (err, results) => {
-//     //         if (err) throw err;
-//     //         if (results.length > 0) {
-//     //             const reviews = results;
-//     //             res.render('reviewPage', { reviews });
-//     //         } else {
-//     //             res.send("No reviews found for this product");
-//     //         }
-//     //         connection.release();
-//     //     });
-//     // });
-// });
+app.post("/reviewPage", async (req, res) => {
+        const productId = req.body.ProductID;
+        
+
+        pool.getConnection(async (err, connection) => {
+            if (err) throw err;
+
+            let sql = 'SELECT * FROM customer_reviews WHERE ProductID = ?;';
+
+            connection.query(sql, [productId], (err, results) => {
+                if (err) throw err;
+
+                console.log(results);
+                res.render('reviewPage', { reviews: results });
+                connection.release();
+            });
+        });
+    });
+
 
 app.get("/home", function (req, res){
     res.render('home.ejs')
@@ -320,6 +321,8 @@ app.post('/adminLogin', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+
 
 
 app.post('/FOOD', function (req, res){
