@@ -1,7 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql2');
-const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity} = require('./db_connect');
+const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity, addnewProduct} = require('./db_connect');
 const dotenv = require('dotenv');
 
 const app = express();
@@ -477,11 +477,38 @@ app.get("/adminPage", function (req, res) {
 app.get("/adminAddProducts", function (req, res) {
     res.render("adminAddProducts.ejs")
 })
+app.post('/adminAdd', async(req,res) => {
+    const {name, category, description, price, quantity, brand, animal, imageurl} = req.body;
+    try {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database:', err);
+                return;
+            }
+            addnewProduct(name, category, description, price, quantity, brand, animal, imageurl, connection)
+            .then(results => {
+                if (results) {
+                    return res.json({ success: true });   
+                }
+            })
+            .catch(error => {
+                console.error('Error adding product', error);
+                res.status(401).send('Error adding product');
+            })
+            .finally(() => {
+                connection.release();
+            });
+         });
+
+    } catch (error) {
+        console.error('Error removing product:', error);
+    }
+})
 app.get("/adminSubProducts", function (req, res) {
     try {
         pool.getConnection((err, connection) => {
             if (err) {
-                console.error('Error connecting to database for admin remove product page:', err);
+                console.error('Error connecting to database for editing product page:', err);
                 return;
 
             }
@@ -501,6 +528,38 @@ app.get("/adminSubProducts", function (req, res) {
     } catch (error) {
         console.error('Error fetching product data:', error);
         res.status(500).send('Internal Server err');
+    }
+});
+app.post('/adminUpdate', async(req,res) =>{
+    const { quantity, productID, action } = req.body;
+    let adjustedQuantity = quantity;
+    try {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database:', err);
+                return;
+            }
+            if(action === 'add'){
+                adjustedQuantity = -quantity;
+            }
+
+            updateProductQuantity(productID, adjustedQuantity, connection)
+            .then(results => {
+                if (results) {
+                    return res.json({ success: true });
+                }
+            })
+            .catch(error => {
+                console.error('Error updating product:', error);
+                res.status(401).send('Error updating product');
+            })
+            .finally(() => {
+                connection.release();
+            });
+         });
+
+    } catch (error) {
+        console.error('Error removing product:', error);
     }
 })
 app.post('/makeAccount', async (req, res) => {

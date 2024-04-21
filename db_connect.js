@@ -117,33 +117,32 @@ async function createAdmin(adminusername, password, email, connection) {
         console.error('Error creating administrator', error);
         throw error; // Rethrow the error
     } finally {
-        connection.release(); // Release the database connection
+        connection.release(); 
     }
 }
 
-async function updateProductQuantity(product, buy_quantity, connection){
+async function updateProductQuantity(productID, quantity, connection){
     try {
         const currentStock = await new Promise((resolve, reject) => {
             connection.query(
-                'SELECT StockQuantity FROM products WHERE Name = ?', [product],
+                'SELECT StockQuantity FROM products WHERE ProductID = ?', [productID],
                 (error, results) => {
                     if (error) {
                         reject(error); 
                     } else {
-                        resolve(results); 
+                        resolve(results[0].StockQuantity); 
                     }
                 }
             );
         });
-
-        const newStock = currentStock - buy_quantity;
+        const newStock = currentStock - quantity;
         if (newStock < 0) {
             throw new Error('Insufficient stock'); 
         }
 
         await new Promise((resolve, reject) => {
             connection.query(
-                'UPDATE products SET StockQuantity = ? WHERE Name = ?',[newStock, product],
+                'UPDATE products SET StockQuantity = ? WHERE ProductID = ?',[newStock, productID],
                 (error, results) => {
                     if (error) {
                         reject(error); 
@@ -154,7 +153,7 @@ async function updateProductQuantity(product, buy_quantity, connection){
             );
         });
 
-        console.log('Purchase has been registered');
+        console.log('Stock has been registered');
         return { success: true }; // Indication of success
     } catch (error) {
         console.error('Error purchasing product', error);
@@ -163,5 +162,32 @@ async function updateProductQuantity(product, buy_quantity, connection){
         connection.release(); // Release the database connection
     }
 }
-module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity };
+
+async function addnewProduct(productname, category, description, price, quantity, brand, animal, image, connection){
+    try {
+        const result = await new Promise((resolve, reject) => {
+            connection.query(
+                "INSERT into products (Name, Category, Description, Price, StockQuantity, Brand, AnimalType, ImageURL) VALUES (?,?,?,?,?,?,?,?)",
+                [productname, category, description, price, quantity, brand, animal, image],
+                (error, results) => {
+                    if (error) {
+                        reject(error); 
+                    } else {
+                        resolve(results); // Resolve the promise with the query results
+                    }
+                }
+            );
+        });
+
+        console.log('Product successfully added');
+        return { success: true }; 
+    } catch (error) {
+        console.error('Error adding product', error);
+        throw error; 
+    } finally {
+        connection.release(); 
+    }
+}
+
+module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity, addnewProduct };
 
