@@ -136,7 +136,6 @@ async function updateProductQuantity(productID, quantity, connection){
             );
         });
         const newStock = currentStock - quantity;
-        console.log(quantity);
         if (newStock < 0) {
             throw new Error('Insufficient stock'); 
         }
