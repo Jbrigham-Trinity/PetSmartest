@@ -1,13 +1,15 @@
 const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql2');
-const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity, addnewProduct, productrecommendation, requireLogin, requireAdminLogin} = require('./db_connect');
+const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity, addnewProduct, productrecommendation, requireLogin, requireAdminLogin, selectProduct} = require('./db_connect');
 const dotenv = require('dotenv');
 const store = new session.MemoryStore();
 const app = express();
 const port = 3000;
 dotenv.config();
-
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -15,7 +17,8 @@ app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs')
 
 app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true })); // Parse request body
+const multer  = require('multer');
+const upload = multer();
 
 const pool = mysql.createPool({
     host: process.env.DATABASE_HOST,
@@ -23,6 +26,21 @@ const pool = mysql.createPool({
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME
 });
+
+function reformatCart(req, product, quantity) {
+    let found = false;
+
+    for (let item of req.session.cart) {
+        if (item.product.ProductID === product.ProductID) {
+            item.quantity += quantity;
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        req.session.cart.push({ product, quantity });
+    }
+}
 
 app.use(session({
     secret: 'yourSecretKey',
@@ -92,7 +110,6 @@ app.get("/shoppingCart", requireLogin, function (req, res) {
     if (!req.session.cart) {
         req.session.cart = [];
     }
-    console.log(req.session.cart);
     res.render('shoppingCart', { cart: req.session.cart });
 });
 
@@ -132,50 +149,76 @@ app.use((req, res, next) => {
 });
 
 
+app.post("/updateCart", upload.none(), async (req, res) => {
+    const formData = req.body;
+    for (let key in formData) {
+        const value = formData[key];
+        console.log(key);
+        console.log(value);
+    }
+
+    pool.getConnection(async (err, connection) => {
+        if (err) throw err;
+        try {
+            for (let key in formData) {
+                const value = formData[key];
+                const productID = key;
+                const quantity = value;
+                selectProduct(productID, connection)
+                .then(results => {
+                    if (results.length > 0) {
+                        const product = results[0];
+                        if (!req.session.cart) {
+                            req.session.cart = [];
+                        }
+                        req.session.cart = [];
+                        reformatCart(req, product, quantity);
+                        return res.json({ success: true });   
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating product:', error);
+                    return res.json({ success: false });   
+                })
+                .finally(() => {
+                    connection.release();
+                });
+             };
+    
+        } catch (error) {
+            console.error('Error removing product:', error);
+        }
+    });
+})
 app.post("/addToCart", async (req, res) => {
-    const productName = req.body.productName;
-
-    pool.getConnection(async (err, connection) => {
-        if (err) throw err;
-        const sql = "SELECT * FROM Products WHERE Name = ?";
-        connection.query(sql, [productName], (err, results) => {
+    const { productID, action} = req.body;
+    try{
+        pool.getConnection((err, connection) => {
             if (err) throw err;
-            if (results.length > 0) {
-                const product = results[0];
-                if (!req.session.cart) {
-                    req.session.cart = [];
+            selectProduct(productID, connection)
+            .then(results => {
+                if (results.length > 0) {
+                    const product = results[0];
+                    if (!req.session.cart) {
+                        req.session.cart = [];
+                    }
+                    reformatCart(req, product, 1);
+                    return res.json({ success: true });   
                 }
-                req.session.cart.push(product);
-                res.redirect('/productPage');
-            } else {
-                res.send("Product not found");
-            }
-            connection.release();
-        });
-    });
-});
+            })
+            .catch(error => {
+                console.error('Error updating product:', error);
+                return res.json({ success: false });   
+            })
+            .finally(() => {
+                connection.release();
+            });
+         });
 
-app.post("/buyNow", async (req, res) => {
-    const productName = req.body.productName;
+    } catch (error) {
+        console.error('Error removing product:', error);
+    }
 
-    pool.getConnection(async (err, connection) => {
-        if (err) throw err;
-        const sql = "SELECT * FROM Products WHERE Name = ?";
-        connection.query(sql, [productName], (err, results) => {
-            if (err) throw err;
-            if (results.length > 0) {
-                const product = results[0];
-                if (!req.session.cart) {
-                    req.session.cart = [];
-                }
-                req.session.cart.push(product);
-                res.redirect('/shoppingCart');
-            } else {
-                res.send("Product not found");
-            }
-            connection.release();
-        });
-    });
 });
 
 app.post("/removeFromCart", async (req, res) => {
@@ -184,7 +227,7 @@ app.post("/removeFromCart", async (req, res) => {
     if (!req.session.cart) {
         req.session.cart = [];
     }
-    req.session.cart = req.session.cart.filter(product => product.Name !== productName); // Removes all instances of the product
+    req.session.cart = req.session.cart.filter(item => item.product.Name !== productName);
     res.redirect('/shoppingCart');
 });
 
@@ -221,8 +264,6 @@ app.post("/checkout", async (req, res) => {
     } catch (error) {
         console.error('Error removing product:', error);
     }
-
-    res.redirect('/checkout');
 });
 app.get("/reviewPage", requireLogin, function (req, res) {
     res.render('reviewPage' )
@@ -563,6 +604,7 @@ app.get("/adminSubProducts", requireAdminLogin, function (req, res) {
 });
 app.post('/adminUpdate', async(req,res) =>{
     const { quantity, productID, action } = req.body;
+
     let adjustedQuantity = quantity;
     try {
         pool.getConnection((err, connection) => {

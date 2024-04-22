@@ -154,15 +154,10 @@
                     <br>
                     <input type="text" id="cvv" name="cvv" placeholder="CVV" required>
                 </fieldset>
-                    <form action="/checkout" method="post">
-                        <% cart.forEach(function(products) { %>
-                            <input type="hidden" name="productID[]" value="<%= products.ProductID %>">
-                            <input type="hidden" name="quantity[]" value="<%= products.StockQuantity %>">
-                        <% }); %>
-                        <button type="submit">Place Order</button>
-                        <br>
-                        <br>
-                    </form>
+                    
+                    <button type="submit">Place Order</button>
+                    <br>
+                    <br>
         </div>
     </body>
 </html>

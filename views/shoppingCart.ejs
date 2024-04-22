@@ -55,26 +55,25 @@
     </nav>
     <body>
         <div class="product-grid">
-            <% var total = 0.0; %>
-            <% cart.forEach(function(products) { %>
+            <% cart.forEach(function(item) { %>
                 <div class="products">
-                    <img src="<%= products.ImageURL %>" alt="Product Image">
-                    <h2><%= products.Name %></h2>
-                    <p><%= products.Description %></p>
-                    <p class="Price"><%= products.Price %></p>
+                    <img src="<%= item.product.ImageURL %>" alt="Product Image">
+                    <h2><%= item.product.Name %></h2>
+                    <p><%= item.product.Description %></p>
+                    <p class="Price"><%= item.product.Price %></p>
+                    <input type="hidden" name="productID" value="<%= item.product.ProductID %>">
 
                     <div class="quantity-controls">
                         <button class="quantity-button decrement" onclick="changeQuantity(this, -1)">-</button>
-                        <input type="number" name="quantity" value="1" min="1" max="10" class="quantity-input" onchange="updateTotal()">
+                        <input type="number" name="cartquantity" value="<%= item.quantity %>" min="1" max="100" class="quantity-input" onchange="updateTotal()">
                         <button class="quantity-button increment" onclick="changeQuantity(this, 1)">+</button>
                     </div>
 
                     <form action="/removeFromCart" method="post">
-                        <input type="hidden" name="productName" value="<%= products.Name %>">
+                        <input type="hidden" name="productName" value="<%= item.product.Name %>">
                         <button type="submit">Remove</button>
                     </form>
                 </div>
-                <% total += parseFloat(products.Price); %>
             <% }); %>
         </div>
         <div class="total">
@@ -82,31 +81,63 @@
         </div>
 
         <a href="checkOut">
-            <button href="checkOut"> Checkout</button>
+            <button onclick="checkout(event)">Checkout</button>
         </a>
+
         <script>
+
             window.addEventListener('load', function() {
                 updateTotal(); // Calculate the initial total when the page loads
             });
 
-         function changeQuantity(button, change) {
-            var input = button.parentNode.querySelector('.quantity-input');
-            var currentValue = parseInt(input.value) + change;
-            if (!isNaN(currentValue) && currentValue >= parseInt(input.getAttribute('min')) && currentValue <= parseInt(input.getAttribute('max'))) {
-                input.value = currentValue;
-                updateTotal();
-            }
-        }
+            async function checkout() {
+                event.preventDefault(); 
+                var formData = new FormData();
 
-        function updateTotal() {
-            var totalAmount = 0;
-            document.querySelectorAll('.products').forEach(function(products) {
-                var price = parseFloat(products.querySelector('.Price').textContent);
-                var quantity = parseInt(products.querySelector('.quantity-input').value);
-                totalAmount += price * quantity;
-            });
-            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
-        }
+                document.querySelectorAll('.products').forEach(function(product) {
+                    const productID = product.querySelector('input[name="productID"]').value;
+                    const quantity = product.querySelector('.quantity-input').value;
+                    formData.append(productID, quantity);
+                });
+                for (let pair of formData.entries()) {
+                        const [key, value] = pair;
+                        alert(`Key: ${key}, Value: ${value}`);
+                }
+                try {
+                    const response = await fetch('/updateCart', {
+                        method: 'POST', 
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded' 
+                        },
+                        body: formData,
+                    });
+
+                    alert(await response.json()); 
+
+                    } catch (error) {
+                        alert('not good'); 
+                    }
+            }                
+
+            
+            function changeQuantity(button, change) {
+                var input = button.parentNode.querySelector('.quantity-input');
+                var currentValue = parseInt(input.value) + change;
+                if (!isNaN(currentValue) && currentValue >= parseInt(input.getAttribute('min')) && currentValue <= parseInt(input.getAttribute('max'))) {
+                    input.value = currentValue;
+                    updateTotal();
+                }
+            }
+
+            function updateTotal() {
+                var totalAmount = 0;
+                document.querySelectorAll('.products').forEach(function(products) {
+                    var price = parseFloat(products.querySelector('.Price').textContent);
+                    var quantity = parseInt(products.querySelector('.quantity-input').value);
+                    totalAmount += price * quantity;
+                });
+                document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+            }
     </script>
 
     </body>

@@ -271,5 +271,28 @@ function requireAdminLogin(req, res, next) {
         res.redirect('/adminLogin');
     }
 }
-module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity, addnewProduct, productrecommendation, requireLogin, requireAdminLogin };
+
+async function selectProduct(productID, connection){
+    try {
+        return new Promise((resolve, reject) => {
+            connection.query("SELECT * FROM products WHERE ProductID = ?", [productID], 
+            (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    if (results.length === 0) {
+                        reject(new Error('No Product'));
+                    } else {
+                        resolve(results);
+                    }
+                }
+            });
+        });
+    } catch (error) {
+        throw error;
+    } finally {
+        connection.release(); 
+    }
+}
+module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity, addnewProduct, productrecommendation, requireLogin, requireAdminLogin, selectProduct };
 

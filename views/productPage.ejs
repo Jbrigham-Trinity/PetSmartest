@@ -67,19 +67,46 @@
                         <p>Price: $<%= products.Price %></p>
                         <!-- Add any additional product details here -->
                         <div class="product-buttons">
-                            <form action="/addToCart" method="post">
-                                <input type="hidden" name="productName" value="<%= products.Name %>">
+                            <form action="/addToCart" method="post"onsubmit="return handleAction(event, 'addtocart')" >
+                                <input type="hidden" name="productID" value="<%= products.ProductID %>">
                                 <button type="submit">Add to Cart</button>
                             </form>
                             
-                            <form action="/buyNow" method="post">
-                                <input type="hidden" name="productName" value="<%= products.Name %>">
+                            <form action="/addToCart" method="post" onsubmit="return handleAction(event, 'buynow')">
+                                <input type="hidden" name="productID" value="<%= products.ProductID %>">
                                 <button type="submit">Buy Now</button>
                             </form>
                             <form action="/reviewPage" method="post">
                                 <input type="hidden" name="productName" value="<%= products.Name %>">
                                 <button type="submit">View Reviews</button>
                             </form>
+                            <script>
+                                async function handleAction(event, action) {
+                                    event.preventDefault(); // Prevent default form submission
+                                    const form = event.target; // Get the form that was submitted
+                                    const productID = form.querySelector('input[name="productID"]').value;
+                                    try {
+                                        const response = await fetch('/addToCart', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ productID, action }),
+                                        });
+
+                                        const data = await response.json(); 
+                                        if(data.success){
+                                            if(action === 'addtocart'){
+                                                window.location.href = '/productPage'; // Redirect to productPage
+                                            } else if (action === 'buynow'){
+                                                window.location.href = '/shoppingCart'; // Redirect to shoppingCart
+                                            }
+                                        } else {
+                                            alert('Fail to add to cart ' + data.error);
+                                        }
+                                    } catch (error) {
+                                        alert('Failed to remove product. Please check your stock.'); 
+                                    }
+                                }
+                            </script>
                         </div>
                     </div>
                 </div>
