@@ -684,3 +684,7 @@ app.post('/makeAccount', async (req, res) => {
 app.listen(port, function () {
     console.log(`Example app listening on port ${port}!`);
 });
+//for testing:
+module.exports = app.listen(3001, function () {
+    //console.log(`Example app listening on port ${3001}!`);
+});
