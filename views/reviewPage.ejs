@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="styles/header.css">
+    <link rel="stylesheet" href="styles/reviews.css">
     
     <header>
         <div class="logo">
@@ -56,11 +56,29 @@
     <body>
         <div class="review-list">
             <h2>Reviews</h2>
-            <ul>
             <% reviews.forEach(function(review) { %>
-                <li><%= review %></li>
+
+                    <!-- <p><%= review.ReviewText %></p> -->
+                    <!-- <fieldset> -->
+                  
+                    <!-- <p>User <%= review.Custusername %> says: </p>
+                    <p><%= review.ReviewText %></p>
+                    <p><%= review.Rating %> Stars</p>
+
+                    <p>Date: <%= review.ReviewDate.toDateString() %></p> -->
+                <fieldset>
+                    <p>User <%= review.Custusername %> says: </p>
+                    <p><%= review.ReviewText %></p>
+                    <div class="star-rating">
+                        <% for (let i = 0; i < review.Rating; i++) { %>
+                            <i class="fas fa-star"></i>
+                        <% } %>
+                    </div>
+                    <p>Date: <%= review.ReviewDate.toDateString() %></p>
+                </fieldset>
+
             <% }); %>
-            </ul>
+
         </div>
     </body>
 </html>
