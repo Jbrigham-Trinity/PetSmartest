@@ -188,11 +188,11 @@ async function addnewProduct(productname, category, description, price, quantity
         connection.release(); 
     }
 }
-async function productrecommendation(username, productID, connection) {
+async function productRecommendation(username, productID, connection) {
     try {
         const alreadyrecommended = await new Promise((resolve, reject) => {
             connection.query(
-                "SELECT * FROM users WHERE Custusername = ? AND ProductID = ?",
+                "SELECT * FROM productrecommendations WHERE Custusername = ? AND ProductID = ?",
                 [username, productID],
                 (error, results) => {
                     if (error) {
@@ -225,8 +225,6 @@ async function productrecommendation(username, productID, connection) {
     } catch (error) {
         console.error('Error recommending product', error);
         throw error; 
-    } finally {
-        connection.release();
     }
 }
 
@@ -236,7 +234,7 @@ async function audit(operation, username, accounttype, productid, detail, connec
 
         const result = await new Promise((resolve, reject) => {
             connection.query(
-                "INSERT into audit_trail (OperationType, Timestamp, Username, AccountType, ProductID, Detail) VALUES (?,?,?,?,?,?)",
+                "INSERT into audit_trail (OperationType, Timestamp, Username, AccountType, ProductID, Details) VALUES (?,?,?,?,?,?)",
                 [operation, timestamp, username, accounttype, productid, detail],
                 (error, results) => {
                     if (error) {
@@ -252,12 +250,10 @@ async function audit(operation, username, accounttype, productid, detail, connec
     } catch (error) {
         console.error('Error updating audit', error);
         throw error; 
-    } finally {
-        connection.release(); 
     }
 }
 function requireLogin(req, res, next) {
-    if (req.session.isLoggedIn || req.session.isAdminLoggedIn) {
+    if (req.session.isLoggedIn) {
         next();
     } else {
         res.redirect('/login');
@@ -290,9 +286,7 @@ async function selectProduct(productID, connection){
         });
     } catch (error) {
         throw error;
-    } finally {
-        connection.release(); 
     }
 }
-module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity, addnewProduct, productrecommendation, requireLogin, requireAdminLogin, selectProduct };
+module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity, addnewProduct, productRecommendation, audit, requireLogin, requireAdminLogin, selectProduct };
 

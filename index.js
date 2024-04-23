@@ -1,7 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql2');
-const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity, addnewProduct, productrecommendation, requireLogin, requireAdminLogin, selectProduct} = require('./db_connect');
+const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity, addnewProduct, productRecommendation, audit, requireLogin, requireAdminLogin, selectProduct} = require('./db_connect');
 const dotenv = require('dotenv');
 const store = new session.MemoryStore();
 const app = express();
@@ -102,7 +102,12 @@ app.get("/accounts", function (req, res) {
     res.send("Welcome to another page!")
 });
 
+
+
 app.get("/checkout", requireLogin, function (req, res) {
+    if (!req.session.cart) {
+        req.session.cart = [];
+    }
     res.render('checkout', { cart: req.session.cart })
 });
 
@@ -151,19 +156,17 @@ app.use((req, res, next) => {
 
 app.post("/updateCart", upload.none(), async (req, res) => {
     const formData = req.body;
-    for (let key in formData) {
-        const value = formData[key];
-        console.log(key);
-        console.log(value);
-    }
+    req.session.cart = [];
 
     pool.getConnection(async (err, connection) => {
         if (err) throw err;
         try {
+            const promises = []; // Array to store promises
             for (let key in formData) {
                 const value = formData[key];
                 const productID = key;
                 const quantity = value;
+                promises.push(
                 selectProduct(productID, connection)
                 .then(results => {
                     if (results.length > 0) {
@@ -171,22 +174,21 @@ app.post("/updateCart", upload.none(), async (req, res) => {
                         if (!req.session.cart) {
                             req.session.cart = [];
                         }
-                        req.session.cart = [];
                         reformatCart(req, product, quantity);
-                        return res.json({ success: true });   
                     }
                 })
                 .catch(error => {
                     console.error('Error updating product:', error);
-                    return res.json({ success: false });   
+                    reject(error);
                 })
-                .finally(() => {
-                    connection.release();
-                });
-             };
-    
+                );
+             }
+             await Promise.all(promises);
+             connection.release();
+             return res.json({ success: true });   
         } catch (error) {
             console.error('Error removing product:', error);
+            return res.jason({ success: false})
         }
     });
 })
@@ -235,35 +237,39 @@ app.post("/checkout", async (req, res) => {
     if (!req.session.cart) {
         req.session.cart = [];
     }
-    const {productIDList, quantitiesList} = req.body;
+
     try {
         pool.getConnection((err, connection) => {
             if (err) {
                 console.error('Error connecting to database:', err);
                 return;
             }
-            for (let i = 0; i < productIDList.length; i++) {
-                const productID = productIDList[i];
-                const quantity = quantitiesList[i];
-                console.log(quantity);
-                updateProductQuantity(productID, quantity, connection)
-                .then(results => {
-                    if (results) {
-                        console.log("success");
-                    }
-                })
-                .catch(error => {
-                    console.error('Error buying:', error);
-                    res.status(401).send('Error buying');
-                })
-                .finally(() => {
-                    connection.release();
-                });
-            }
+            const currentUser = req.session.user[0].Custusername;
+            Promise.all(req.session.cart.map(async (cartItem) => {
+                const productID = cartItem.product.ProductID;
+                const quantity = cartItem.quantity;
+                const productName = cartItem.product.Name;
+                console.log(cartItem.product.ProductID + " " + quantity);
+                await updateProductQuantity(productID, quantity, connection);
+                await productRecommendation(currentUser, productID, connection);
+                await audit("Delete", currentUser, "User", productID, currentUser + " bought " + quantity + " of " + productName, connection);
+            }))
+            .then(() => {
+                console.log("All bought items updated");
+                res.redirect('/home')
+            })
+            .catch(error => {
+                console.error('Error updating product quantities:', error);
+            })
+            .finally(() => {
+                connection.release();
+            });
         });
     } catch (error) {
-        console.error('Error removing product:', error);
+        console.error('Error during checkout:', error);
+        res.status(500).send('Internal server error');
     }
+
 });
 app.get("/reviewPage", requireLogin, function (req, res) {
     res.render('reviewPage' )

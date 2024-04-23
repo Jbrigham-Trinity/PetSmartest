@@ -80,9 +80,8 @@
             <h2>Total: $<span id="totalAmount"></span><h2> <!-- Updated dynamically by JavaScript -->
         </div>
 
-        <a href="checkOut">
-            <button onclick="checkout(event)">Checkout</button>
-        </a>
+        <button onclick="checkout(event)">Checkout</button>
+
 
         <script>
 
@@ -99,24 +98,21 @@
                     const quantity = product.querySelector('.quantity-input').value;
                     formData.append(productID, quantity);
                 });
-                for (let pair of formData.entries()) {
-                        const [key, value] = pair;
-                        alert(`Key: ${key}, Value: ${value}`);
-                }
-                try {
+                try{
                     const response = await fetch('/updateCart', {
                         method: 'POST', 
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded' 
-                        },
                         body: formData,
                     });
-
-                    alert(await response.json()); 
-
-                    } catch (error) {
-                        alert('not good'); 
+                    const data = await response.json(); // Parse JSON response
+                    if(data.success){
+                        window.location.href = '/checkOut'; // Redirect on success
+                    } else {
+                        alert('Failed:' + data.error);
+                        window.location.href = '/checkOut';
                     }
+                } catch (error) {
+                    alert(error); 
+                }
             }                
 
             
