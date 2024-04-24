@@ -228,14 +228,14 @@ async function productRecommendation(username, productID, connection) {
     }
 }
 
-async function audit(operation, username, accounttype, productid, detail, connection) {
+async function audit(operation, username, accounttype, productid, detail, adminusername, connection) {
     try {
         const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
         const result = await new Promise((resolve, reject) => {
             connection.query(
-                "INSERT into audit_trail (OperationType, Timestamp, Username, AccountType, ProductID, Details) VALUES (?,?,?,?,?,?)",
-                [operation, timestamp, username, accounttype, productid, detail],
+                "INSERT into audit_trail (OperationType, Timestamp, Username, AccountType, ProductID, Details, AdminUsername) VALUES (?,?,?,?,?,?,?)",
+                [operation, timestamp, username, accounttype, productid, detail, adminusername],
                 (error, results) => {
                     if (error) {
                         reject(error); 

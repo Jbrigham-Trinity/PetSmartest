@@ -253,7 +253,7 @@ app.post("/checkout", async (req, res) => {
                 console.log(cartItem.product.ProductID + " " + quantity);
                 await updateProductQuantity(productID, quantity, connection);
                 await productRecommendation(currentUser, productID, connection);
-                await audit("Delete", currentUser, "User", productID, currentUser + " bought " + quantity + " of " + productName, connection);
+                await audit("Delete", currentUser, "User", productID, currentUser + " bought " + quantity + " of " + productName,null, connection);
             }))
             .then(() => {
                 console.log("All bought items updated");
@@ -643,9 +643,9 @@ app.post('/adminAdd', async(req,res) => {
             }
         const productID = await addnewProduct(name, category, description, price, quantity, brand, animal, imageurl, connection);
         console.log(productID); 
-        // await audit("Add", adminusername, "Admin", productID, 
-        //                 `Admin created a new product named ${name} with ${quantity} in stock`, 
-        //                 connection);
+        await audit("Add", null, "Admin", productID, 
+                         `Admin created a new product named ${name} with ${quantity} in stock`, adminusername,
+                         connection);
         connection.release(); 
         res.json({ success: true }); 
         })
@@ -697,9 +697,9 @@ app.post('/adminUpdate', async(req,res) =>{
             }
 
             await updateProductQuantity(productID, adjustedQuantity, connection);
-            // await audit("Edit", adminusername, "Admin", productID, 
-            //             `Admin ${action} ${quantity} ${productName}  ${quantity} from stock`, 
-            //             connection);
+            await audit("Edit", null, "Admin", productID, 
+                         `Admin ${action} ${quantity} ${productName}  ${quantity} from stock`, adminusername,
+                         connection);
             connection.release();
             return res.json({ success: true });
         });
