@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles/header.css">
+    
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3; /* Light gray background */
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 12px;
+            color: #333; /* Dark gray text color */
+        }
+        th {
+            background-color: #e0e0e0; /* Light gray header background */
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #ffffff; /* White background for even rows */
+        }
+        tr:nth-child(odd) {
+            background-color: #f9f9f9; /* Light gray background for odd rows */
+        }
+        tr:hover {
+            background-color: #d3d3d3; /* Darker gray background on hover */
+        }
+    </style>
+    </head>
+
+    <header>
+        <div class="logo">
+            <a href="adminPage" class="icon-link">
+                <!-- <i class="fas fa-home"></i> -->
+                <img src="assets/tinyDog.png">
+            </a>
+        </div>
+        <div class="right-icons">
+            <a href="login" class="icon-link">
+                <i class="fas fa-user fa-2x"></i>
+            </a>
+        </div>
+    </header>
+
+    <body>
+        <div class="audit-list">
+    <h2>Audit Trail</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Audit Number</th>
+                <th>Operation Type</th>
+                <th>Timestamp</th>
+                <th>Username</th>
+                <th>Account Type</th>
+                <th>Product ID</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% audit.forEach(function(audit) { %>
+                <tr>
+                    <td><%= audit.AuditID %></td>
+                    <td><%= audit.OperationType %></td>
+                    <td><%= audit.Timestamp %></td>
+                    <td><%= audit.Username %></td>
+                    <td><%= audit.AccountType %></td>
+                    <td><%= audit.ProductID %></td>
+                    <td><%= audit.Details %></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

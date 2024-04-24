@@ -173,14 +173,14 @@ async function addnewProduct(productname, category, description, price, quantity
                     if (error) {
                         reject(error); 
                     } else {
-                        resolve(results); // Resolve the promise with the query results
+                        resolve(results.insertId); 
                     }
                 }
             );
         });
 
         console.log('Product successfully added');
-        return { success: true }; 
+        return result; 
     } catch (error) {
         console.error('Error adding product', error);
         throw error; 
@@ -246,7 +246,7 @@ async function audit(operation, username, accounttype, productid, detail, connec
                 }
             );
         });
-
+        return { success : true }
     } catch (error) {
         console.error('Error updating audit', error);
         throw error; 
@@ -268,6 +268,26 @@ function requireAdminLogin(req, res, next) {
     }
 }
 
+async function selectRecommendation(username, connection){
+    try {
+        return new Promise((resolve, reject) => {
+            connection.query("SELECT * FROM productrecommendations WHERE Custusername = ?", [username], 
+            (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    if (results.length === 0) {
+                        reject(new Error('No Product'));
+                    } else {
+                        resolve(results);
+                    }
+                }
+            });
+        });
+    } catch (error) {
+        throw error;
+    }
+}
 async function selectProduct(productID, connection){
     try {
         return new Promise((resolve, reject) => {
@@ -288,5 +308,22 @@ async function selectProduct(productID, connection){
         throw error;
     }
 }
-module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity, addnewProduct, productRecommendation, audit, requireLogin, requireAdminLogin, selectProduct };
+async function getAudit(connection){
+    try {
+        return new Promise((resolve, reject) => {
+            connection.query("SELECT * FROM audit_trail", 
+            (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                   resolve(results);
+                }
+            });
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity, 
+addnewProduct, productRecommendation, audit, requireLogin, requireAdminLogin, selectProduct , selectRecommendation, getAudit };
 

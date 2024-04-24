@@ -35,36 +35,29 @@
                         <!-- Add any additional product details here -->
                         <div class="product-buttons">
                             
-                            <form action="/adminUpdate" method="post" onsubmit="return handleUpdate(event, 'remove')">
-                                <input type="hidden" name="productname" value="<%= products.Name %>">
-                                <input type="number" name="quantityToRemove" placeholder="Quantity" class="quantity">
-                                <input type="hidden" name="productID" value="<%= products.ProductID %>">
+                            <form action="/adminUpdate" method="post" onsubmit="return handleUpdate(event, 'remove', '<%= products.ProductID %>', '<%= products.Name %>')">
+                                <input type="number" name="quantityToRemove_<%= products.ProductID %>" placeholder="Quantity" class="quantity">
                                 <button type="submit">Remove</button>
                             </form>
 
-                            <form action="/adminUpdate" method="post" onsubmit="return handleUpdate(event, 'add')">
-                                <input type="hidden" name="productname" value="<%= products.Name %>">
-                                <input type="number" name="quantityToAdd" placeholder="Quantity" class="quantity">
-                                <input type="hidden" name="productID" value="<%= products.ProductID %>">
+                            <form action="/adminUpdate" method="post" onsubmit="return handleUpdate(event, 'add', '<%= products.ProductID %>', '<%= products.Name %>')">
+                                <input type="number" name="quantityToAdd_<%= products.ProductID %>" placeholder="Quantity" class="quantity">
                                 <button type="submit">Add</button>
                             </form>
                             <script>
-                                async function handleUpdate(event, action) {
+                                async function handleUpdate(event, action, productID, productName) {
                                     event.preventDefault(); // Prevent default form submission
                                     let quantity;
                                     if (action === 'add') {
-                                        quantity = parseInt(document.querySelector('input[name="quantityToAdd"]').value);
+                                        quantity = parseInt(document.querySelector(`input[name="quantityToAdd_${productID}"]`).value);
                                     } else if (action === 'remove') {
-                                        quantity = parseInt(document.querySelector('input[name="quantityToRemove"]').value);
+                                        quantity = parseInt(document.querySelector(`input[name="quantityToRemove_${productID}"]`).value);
                                     }
-                                    const productID = document.querySelector('input[name="productID"]').value;
-                                    const productName = document.querySelector('input[name="productname"]').value;
-
                                     try {
                                         const response = await fetch('/adminUpdate', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ quantity, productID, action }),
+                                            body: JSON.stringify({ productName, quantity, productID, action }),
                                         });
 
                                         const data = await response.json(); // Parse JSON response

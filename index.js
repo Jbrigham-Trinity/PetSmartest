@@ -1,7 +1,8 @@
 const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql2');
-const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity, addnewProduct, productRecommendation, audit, requireLogin, requireAdminLogin, selectProduct} = require('./db_connect');
+const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity, addnewProduct, 
+    productRecommendation, audit, requireLogin, requireAdminLogin, selectProduct, selectRecommendation, getAudit} = require('./db_connect');
 const dotenv = require('dotenv');
 const store = new session.MemoryStore();
 const app = express();
@@ -161,7 +162,7 @@ app.post("/updateCart", upload.none(), async (req, res) => {
     pool.getConnection(async (err, connection) => {
         if (err) throw err;
         try {
-            const promises = []; // Array to store promises
+            const promises = []; 
             for (let key in formData) {
                 const value = formData[key];
                 const productID = key;
@@ -278,7 +279,6 @@ app.get("/reviewPage", requireLogin, function (req, res) {
 app.post("/reviewPage", async (req, res) => {
         const productId = req.body.ProductID;
         
-
         pool.getConnection(async (err, connection) => {
             if (err) throw err;
 
@@ -348,8 +348,9 @@ app.post('/adminLogin', async (req, res) => {
             verifyAdminAccount(username, password, connection)
                 .then(admin => {
                     if (admin) {
-                        req.session.admin = admin;  // Set admin info in session
-                        req.session.isAdminLoggedIn = true; // Set the admin login flag
+                        console.log(admin);
+                        req.session.admin = admin;  
+                        req.session.isAdminLoggedIn = true; 
                         res.redirect('/adminPage');  // Redirect to the admin page
                     } else {
                         res.status(401).send('Invalid username or password');
@@ -369,6 +370,43 @@ app.post('/adminLogin', async (req, res) => {
     }
 });
 
+app.post('/RECOMMENDATIONS', function (req, res){
+    try {
+        pool.getConnection(async (err, connection) => {
+            if(err){
+                throw err;
+            }
+            const currentUser = req.session.user[0].Custusername;
+
+            const allRecommendation = await selectRecommendation(currentUser, connection);
+
+            if (allRecommendation.length > 0) {
+                const productPromises = allRecommendation.map(async recommendation => {
+                    try {
+                        const productDetails = await selectProduct(recommendation.ProductID, connection);
+                        return productDetails;
+                    } catch (error) {
+                        console.error("Error fetching product details:", error);
+                        return null;
+                    }
+                });
+
+                const products = await Promise.all(productPromises);
+
+                const validProducts = products.filter(product => product !== null);
+                console.log(validProducts);
+                res.render('productPage', { products: validProducts.flat() });
+            } else {
+                res.render('productPage', { products: [] });
+            }
+            connection.release();
+    });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).send("Internal Server Error");
+    }
+
+});
 
 
 
@@ -552,98 +590,6 @@ app.post('/ALL', function (req, res){
 app.get("/makeAccount", function (req, res){
     res.render('makeAccount.ejs')
 })
-app.get("/adminPage", requireAdminLogin, function (req, res) {
-    res.render("adminPage.ejs")
-})
-app.get("/adminAddProducts", requireAdminLogin, function (req, res) {
-    res.render("adminAddProducts.ejs")
-})
-app.post('/adminAdd', async(req,res) => {
-    const {name, category, description, price, quantity, brand, animal, imageurl} = req.body;
-    try {
-        pool.getConnection((err, connection) => {
-            if (err) {
-                console.error('Error connecting to database:', err);
-                return;
-            }
-            addnewProduct(name, category, description, price, quantity, brand, animal, imageurl, connection)
-            .then(results => {
-                if (results) {
-                    return res.json({ success: true });   
-                }
-            })
-            .catch(error => {
-                console.error('Error adding product', error);
-                res.status(401).send('Error adding product');
-            })
-            .finally(() => {
-                connection.release();
-            });
-         });
-
-    } catch (error) {
-        console.error('Error removing product:', error);
-    }
-})
-app.get("/adminSubProducts", requireAdminLogin, function (req, res) {
-    try {
-        pool.getConnection((err, connection) => {
-            if (err) {
-                console.error('Error connecting to database for editing product page:', err);
-                return;
-
-            }
-            const productInstance = Product.getProductInstance();
-            productInstance.getProductData(connection)
-                .then(products => {
-                    res.render('adminSubProducts', { products });
-                })
-                .catch(error => {
-                    console.error('Error fetching product data:', error);
-                    res.status(500).send('Internal Server err');
-                })
-                .finally(() => {
-                    connection.release();
-                });
-        });
-    } catch (error) {
-        console.error('Error fetching product data:', error);
-        res.status(500).send('Internal Server err');
-    }
-});
-app.post('/adminUpdate', async(req,res) =>{
-    const { quantity, productID, action } = req.body;
-
-    let adjustedQuantity = quantity;
-    try {
-        pool.getConnection((err, connection) => {
-            if (err) {
-                console.error('Error connecting to database:', err);
-                return;
-            }
-            if(action === 'add'){
-                adjustedQuantity = -quantity;
-            }
-
-            updateProductQuantity(productID, adjustedQuantity, connection)
-            .then(results => {
-                if (results) {
-                    return res.json({ success: true });
-                }
-            })
-            .catch(error => {
-                console.error('Error updating product:', error);
-                res.status(401).send('Error updating product');
-            })
-            .finally(() => {
-                connection.release();
-            });
-         });
-
-    } catch (error) {
-        console.error('Error removing product:', error);
-    }
-})
 app.post('/makeAccount', async (req, res) => {
     const { username, password, confirmPassword, email } = req.body;
 
@@ -681,9 +627,111 @@ app.post('/makeAccount', async (req, res) => {
         res.status(500).send('Error creating user');   
     }
 })
+app.get("/adminPage", requireAdminLogin, function (req, res) {
+    res.render("adminPage.ejs")
+})
+app.get("/adminAddProducts", requireAdminLogin, function (req, res) {
+    res.render("adminAddProducts.ejs")
+})
+app.post('/adminAdd', async(req,res) => {
+    const {name, category, description, price, quantity, brand, animal, imageurl} = req.body;
+    const adminusername = req.session.admin[0].AdminUserName;
+    try {
+        pool.getConnection(async (err, connection) => {
+            if(err){
+                throw err;
+            }
+        const productID = await addnewProduct(name, category, description, price, quantity, brand, animal, imageurl, connection);
+        console.log(productID); 
+        // await audit("Add", adminusername, "Admin", productID, 
+        //                 `Admin created a new product named ${name} with ${quantity} in stock`, 
+        //                 connection);
+        connection.release(); 
+        res.json({ success: true }); 
+        })
+    } catch (error) {
+        console.error('Error adding product or updating audit trail:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get("/adminSubProducts", requireAdminLogin, function (req, res) {
+    try {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database for editing product page:', err);
+                return;
+
+            }
+            const productInstance = Product.getProductInstance();
+            productInstance.getProductData(connection)
+                .then(products => {
+                    res.render('adminSubProducts', { products });
+                })
+                .catch(error => {
+                    console.error('Error fetching product data:', error);
+                    res.status(500).send('Internal Server err');
+                })
+                .finally(() => {
+                    connection.release();
+                });
+        });
+    } catch (error) {
+        console.error('Error fetching product data:', error);
+        res.status(500).send('Internal Server err');
+    }
+});
+app.post('/adminUpdate', async(req,res) =>{
+    const { productName, quantity, productID, action } = req.body;
+    const adminusername = req.session.admin[0].AdminUserName;
+
+    let adjustedQuantity = quantity;
+    try {
+        pool.getConnection(async (err, connection) => {
+            if (err) {
+                console.error('Error connecting to database:', err);
+                return;
+            }
+            if(action === 'add'){
+                adjustedQuantity = -quantity;
+            }
+
+            await updateProductQuantity(productID, adjustedQuantity, connection);
+            // await audit("Edit", adminusername, "Admin", productID, 
+            //             `Admin ${action} ${quantity} ${productName}  ${quantity} from stock`, 
+            //             connection);
+            connection.release();
+            return res.json({ success: true });
+        });
+    } catch (error) {
+        console.error('Error removing product:', error);
+    }
+})
+
+app.get("/auditTrail", requireAdminLogin, async function (req, res) {
+    try {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                throw err;
+            }
+            getAudit(connection)
+                .then(audit => {
+                    res.render('auditTrail', { audit });
+                })
+                .finally(() => {
+                    connection.release();
+
+            });
+        })
+    } catch (error) {
+        console.error('Error fetching audit:', error);
+        res.status(500).send('Internal Server err');
+    }
+});
 app.listen(port, function () {
     console.log(`Example app listening on port ${port}!`);
 });
+
 //for testing:
 module.exports = app.listen(3001, function () {
     //console.log(`Example app listening on port ${3001}!`);
