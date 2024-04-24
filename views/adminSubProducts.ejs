@@ -35,13 +35,13 @@
                         <!-- Add any additional product details here -->
                         <div class="product-buttons">
                             
-                            <form action="/adminUpdate" method="post" onsubmit="return handleUpdate(event, 'remove', '<%= products.ProductID %>', '<%= products.Name %>')">
-                                <input type="number" name="quantityToRemove_<%= products.ProductID %>" placeholder="Quantity" class="quantity">
+                            <form action="/adminUpdate" method="post" onsubmit="return handleUpdate(event, 'remove', '<%= products.ProductID %>', '<%= products.Name %>')" >
+                                <input type="number" name="quantityToRemove_<%= products.ProductID %>" placeholder="Quantity" class="quantity" oninput="preventNegativeInput(event)">
                                 <button type="submit">Remove</button>
                             </form>
 
                             <form action="/adminUpdate" method="post" onsubmit="return handleUpdate(event, 'add', '<%= products.ProductID %>', '<%= products.Name %>')">
-                                <input type="number" name="quantityToAdd_<%= products.ProductID %>" placeholder="Quantity" class="quantity">
+                                <input type="number" name="quantityToAdd_<%= products.ProductID %>" placeholder="Quantity" class="quantity" oninput="preventNegativeInput(event)">
                                 <button type="submit">Add</button>
                             </form>
                             <script>
@@ -69,6 +69,12 @@
                                         }
                                     } catch (error) {
                                         alert('Failed to remove product. Please check your stock.'); 
+                                    }
+                                }
+
+                                function preventNegativeInput(event) {
+                                    if (event.target.value <= 0) {
+                                        event.target.value = 1;
                                     }
                                 }
                             </script>
