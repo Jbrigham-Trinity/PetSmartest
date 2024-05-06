@@ -99,8 +99,8 @@ app.get("shopping", function(req, res) {
     res.render("productPage.ejs")
 });
 
-app.get("/accounts", function (req, res) {
-    res.send("Welcome to another page!")
+app.get("/account", requireLogin, function (req, res) {
+	res.render("profilePage.ejs")
 });
 
 
@@ -189,7 +189,7 @@ app.post("/updateCart", upload.none(), async (req, res) => {
              return res.json({ success: true });   
         } catch (error) {
             console.error('Error removing product:', error);
-            return res.jason({ success: false})
+            return res.json({ success: false})
         }
     });
 })
@@ -322,13 +322,34 @@ app.post('/login', async (req, res) => {
                 .catch(error => {
                     console.error('Error verifying user account:', error);
                     return res.json({ success: false });   
-                })
+               	 })
                 .finally(() => {
                     connection.release();
                 });
         });
     } catch (error) {
         console.error('Error processing login request:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.post('/logout', requireLogin, async (req, res) => {
+    const username = req.session.user
+    try {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                console.error('Error connecting to database:', err);
+                return;
+            } 
+	            if (req.session.user) {
+                        req.session.user = null;  // Set user info in session to null
+                        req.session.isLoggedIn = false; // Set the login flag to false
+                        connection.release();
+                        res.redirect('login')
+                    }
+        });
+    } catch (error) {
+        console.error('Error processing logout request:', error);
         res.status(500).send('Internal Server Error');
     }
 });
