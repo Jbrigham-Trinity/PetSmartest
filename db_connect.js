@@ -276,11 +276,7 @@ async function selectRecommendation(username, connection){
                 if (error) {
                     reject(error);
                 } else {
-                    if (results.length === 0) {
-                        reject(new Error('No Product'));
-                    } else {
-                        resolve(results);
-                    }
+                    resolve(results);
                 }
             });
         });

@@ -63,7 +63,9 @@
         <div class="product-grid">
             <% products.forEach(function(products) { %>
                 <div class="products">
-                    <img src="<%= products.ImageURL %>" alt="Product Image">
+                    <div style="height: 300px; overflow: hidden; border-radius: 10px;">
+                        <img style="width: 100%; height: 100%; object-fit: cover; " src="<%= products.ImageURL %>" alt="Product Image">
+                    </div>
                     <div class="product-info">
                         <h2><%= products.Name %></h2>
                         <p><%= products.Description %></p>
