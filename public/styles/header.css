@@ -2,14 +2,14 @@ body, html {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #04cef1 50%, #1b86f9 100%);
+    background: linear-gradient(to right, #f9821b 50%, #f9d01b 100%);
     padding-top: 60px; /* Adjust this value based on the total height of your fixed header and nav */
 }
 
 header, nav {
     position: fixed;
     width: 100%;
-    background: linear-gradient(to right, #04cef1 50%, #1b86f9 100%);
+    background: linear-gradient(to right, #f9821b 50%, #f9d01b 100%);
     color: white;
     display: flex;
     /* align-items: center; */
@@ -58,7 +58,7 @@ button[type="submit"] {
     padding: 10px 10px;
     border: none;
     border-radius: 25px;
-    background-color: #007bff;
+    background-color: #ff0000;
     color: white;
     font-size: 16px;
     cursor: pointer;
@@ -86,7 +86,7 @@ button[type="submit"] {
 .search-button {
     padding: 5px;
     border: none;
-    background-color: #007bff;
+    background-color: #ff0000;
     color: white;
     border-radius: 50px;
     cursor: pointer;
@@ -98,7 +98,7 @@ button[type="submit"] {
 }
 
 .search-button:hover {
-    background-color: #0056b3;
+    background-color: #b30000;
 }
 .fas {
     color: #ffffff;
@@ -126,12 +126,12 @@ nav {
     align-items: center;
     gap: 10px;
     justify-content: center;
-    background: linear-gradient(to right, #04cef1 50%, #1b86f9 100%);
+    background: linear-gradient(to right, #f9821b 50%, #f9d01b 100%);
 }
 nav button {
     padding: 5px 35px;
     border: none;
-    background-color: #007bff;
+    background-color: #ff0000;
     color: white;
     border-radius: 50px;
     cursor: pointer;
@@ -139,7 +139,7 @@ nav button {
     font-size: 18px;
 }
 nav button:hover {
-    background-color: #0056b3;
+    background-color: #b30000;
     transform: translateY(-0.25em);
 }
 .products {
@@ -161,7 +161,7 @@ nav button:hover {
 .products button {
     padding: 5px 10px;
     border: none;
-    background-color: #007bff;
+    background-color: #ff0000;
     color: white;
     border-radius: 50px;
     cursor: pointer;
@@ -170,7 +170,7 @@ nav button:hover {
     margin: 5px;
 }
 .products button:hover {
-    background-color: #0056b3;
+    background-color: #b30000;
     transform: translateY(-0.25em);
 }
 .products:hover {
