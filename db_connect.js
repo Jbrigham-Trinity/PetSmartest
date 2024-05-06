@@ -3,45 +3,45 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 class Product {
-	static getProductInstance(){
+    static getProductInstance() {
         if (!this.instance) {
             this.instance = new Product();
         }
         return this.instance;
     }
 
-	async getProductData(connection) {
-		return new Promise((resolve, reject) => {
-			connection.query("SELECT * FROM products", (err, rows) => {
-				if (err) {
-					console.error('Error executing SQL query:', err);
-					connection.release(); // Release the connection back to the pool
-					reject(err); // Reject the promise with the error
-				} else {
-					// Process fetched products
-					const products = rows.map(row => row); 
-					resolve(products); // Resolve the promise with the array of products					
-				}
-			});
-		});
-	}
+    async getProductData(connection) {
+        return new Promise((resolve, reject) => {
+            connection.query("SELECT * FROM products", (err, rows) => {
+                if (err) {
+                    console.error('Error executing SQL query:', err);
+                    connection.release(); // Release the connection back to the pool
+                    reject(err); // Reject the promise with the error
+                } else {
+                    // Process fetched products
+                    const products = rows.map(row => row);
+                    resolve(products); // Resolve the promise with the array of products					
+                }
+            });
+        });
+    }
 }
 
 async function verifyUserAccount(custusername, password, connection) {
     try {
         return new Promise((resolve, reject) => {
-            connection.query('SELECT * FROM users WHERE Custusername = ? AND PasswordHash = ?', [custusername, password], 
-            (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    if (results.length === 0) {
-                        reject(new Error('Invalid username or password.'));
+            connection.query('SELECT * FROM users WHERE Custusername = ? AND PasswordHash = ?', [custusername, password],
+                (error, results) => {
+                    if (error) {
+                        reject(error);
                     } else {
-                        resolve(results);
+                        if (results.length === 0) {
+                            reject(new Error('Invalid username or password.'));
+                        } else {
+                            resolve(results);
+                        }
                     }
-                }
-            });
+                });
         });
     } catch (error) {
         throw error;
@@ -77,18 +77,18 @@ async function createUser(username, password, email, connection) {
 async function verifyAdminAccount(adminusername, password, connection) {
     try {
         return new Promise((resolve, reject) => {
-            connection.query('SELECT * FROM admins WHERE AdminUserName = ? AND PasswordHash = ?', [adminusername, password], 
-            (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    if (results.length === 0) {
-                        reject(new Error('Invalid username or password.'));
+            connection.query('SELECT * FROM admins WHERE AdminUserName = ? AND PasswordHash = ?', [adminusername, password],
+                (error, results) => {
+                    if (error) {
+                        reject(error);
                     } else {
-                        resolve(results);
+                        if (results.length === 0) {
+                            reject(new Error('Invalid username or password.'));
+                        } else {
+                            resolve(results);
+                        }
                     }
-                }
-            });
+                });
         });
     } catch (error) {
         throw error;
@@ -117,35 +117,35 @@ async function createAdmin(adminusername, password, email, connection) {
         console.error('Error creating administrator', error);
         throw error; // Rethrow the error
     } finally {
-        connection.release(); 
+        connection.release();
     }
 }
 
-async function updateProductQuantity(productID, quantity, connection){
+async function updateProductQuantity(productID, quantity, connection) {
     try {
         const currentStock = await new Promise((resolve, reject) => {
             connection.query(
                 'SELECT StockQuantity FROM products WHERE ProductID = ?', [productID],
                 (error, results) => {
                     if (error) {
-                        reject(error); 
+                        reject(error);
                     } else {
-                        resolve(results[0].StockQuantity); 
+                        resolve(results[0].StockQuantity);
                     }
                 }
             );
         });
         const newStock = currentStock - quantity;
         if (newStock < 0) {
-            throw new Error('Insufficient stock'); 
+            throw new Error('Insufficient stock');
         }
 
         await new Promise((resolve, reject) => {
             connection.query(
-                'UPDATE products SET StockQuantity = ? WHERE ProductID = ?',[newStock, productID],
+                'UPDATE products SET StockQuantity = ? WHERE ProductID = ?', [newStock, productID],
                 (error, results) => {
                     if (error) {
-                        reject(error); 
+                        reject(error);
                     } else {
                         resolve(); // Resolve the promise if the update is successful
                     }
@@ -163,7 +163,7 @@ async function updateProductQuantity(productID, quantity, connection){
     }
 }
 
-async function addnewProduct(productname, category, description, price, quantity, brand, animal, image, connection){
+async function addnewProduct(productname, category, description, price, quantity, brand, animal, image, connection) {
     try {
         const result = await new Promise((resolve, reject) => {
             connection.query(
@@ -171,21 +171,21 @@ async function addnewProduct(productname, category, description, price, quantity
                 [productname, category, description, price, quantity, brand, animal, image],
                 (error, results) => {
                     if (error) {
-                        reject(error); 
+                        reject(error);
                     } else {
-                        resolve(results.insertId); 
+                        resolve(results.insertId);
                     }
                 }
             );
         });
 
         console.log('Product successfully added');
-        return result; 
+        return result;
     } catch (error) {
         console.error('Error adding product', error);
-        throw error; 
+        throw error;
     } finally {
-        connection.release(); 
+        connection.release();
     }
 }
 async function productRecommendation(username, productID, connection) {
@@ -196,9 +196,9 @@ async function productRecommendation(username, productID, connection) {
                 [username, productID],
                 (error, results) => {
                     if (error) {
-                        reject(error); 
+                        reject(error);
                     } else {
-                        resolve(results.length > 0); 
+                        resolve(results.length > 0);
                     }
                 }
             );
@@ -213,10 +213,10 @@ async function productRecommendation(username, productID, connection) {
                     [username, productID],
                     (error, results) => {
                         if (error) {
-                            reject(error); 
+                            reject(error);
                         } else {
                             console.log('Recommendation updated');
-                            resolve(); 
+                            resolve();
                         }
                     }
                 );
@@ -224,7 +224,7 @@ async function productRecommendation(username, productID, connection) {
         }
     } catch (error) {
         console.error('Error recommending product', error);
-        throw error; 
+        throw error;
     }
 }
 
@@ -238,18 +238,18 @@ async function audit(operation, username, accounttype, productid, detail, adminu
                 [operation, timestamp, username, accounttype, productid, detail, adminusername],
                 (error, results) => {
                     if (error) {
-                        reject(error); 
+                        reject(error);
                     } else {
                         console.log("audit updated");
-                        resolve(); 
+                        resolve();
                     }
                 }
             );
         });
-        return { success : true }
+        return { success: true }
     } catch (error) {
         console.error('Error updating audit', error);
-        throw error; 
+        throw error;
     }
 }
 function requireLogin(req, res, next) {
@@ -268,62 +268,64 @@ function requireAdminLogin(req, res, next) {
     }
 }
 
-async function selectRecommendation(username, connection){
+async function selectRecommendation(username, connection) {
     try {
         return new Promise((resolve, reject) => {
-            connection.query("SELECT * FROM productrecommendations WHERE Custusername = ?", [username], 
-            (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    if (results.length === 0) {
-                        reject(new Error('No Product'));
+            connection.query("SELECT * FROM productrecommendations WHERE Custusername = ?", [username],
+                (error, results) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        if (results.length === 0) {
+                            reject(new Error('No Product'));
+                        } else {
+                            resolve(results);
+                        }
+                    }
+                });
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+async function selectProduct(productID, connection) {
+    try {
+        return new Promise((resolve, reject) => {
+            connection.query("SELECT * FROM products WHERE ProductID = ?", [productID],
+                (error, results) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        if (results.length === 0) {
+                            reject(new Error('No Product'));
+                        } else {
+                            resolve(results);
+                        }
+                    }
+                });
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+async function getAudit(connection) {
+    try {
+        return new Promise((resolve, reject) => {
+            connection.query("SELECT * FROM audit_trail",
+                (error, results) => {
+                    if (error) {
+                        reject(error);
                     } else {
                         resolve(results);
                     }
-                }
-            });
+                });
         });
     } catch (error) {
         throw error;
     }
 }
-async function selectProduct(productID, connection){
-    try {
-        return new Promise((resolve, reject) => {
-            connection.query("SELECT * FROM products WHERE ProductID = ?", [productID], 
-            (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    if (results.length === 0) {
-                        reject(new Error('No Product'));
-                    } else {
-                        resolve(results);
-                    }
-                }
-            });
-        });
-    } catch (error) {
-        throw error;
-    }
-}
-async function getAudit(connection){
-    try {
-        return new Promise((resolve, reject) => {
-            connection.query("SELECT * FROM audit_trail", 
-            (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                   resolve(results);
-                }
-            });
-        });
-    } catch (error) {
-        throw error;
-    }
-}
-module.exports = { Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity, 
-addnewProduct, productRecommendation, audit, requireLogin, requireAdminLogin, selectProduct , selectRecommendation, getAudit };
+module.exports = {
+    Product, createUser, verifyUserAccount, createAdmin, verifyAdminAccount, updateProductQuantity,
+    addnewProduct, productRecommendation, audit, requireLogin, requireAdminLogin, selectProduct, selectRecommendation, getAudit
+};
 

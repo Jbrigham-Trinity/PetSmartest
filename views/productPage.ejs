@@ -1,120 +1,126 @@
 <!DOCTYPE html>
 <html>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="styles/header.css">
-    
-    <header>
-        <div class="logo">
-            <a href="home" class="icon-link">
-                <!-- <i class="fas fa-home"></i> -->
-                <img src="assets/tinyDog.png">
-            </a>
-        </div>
-        <div class="center-search">
-            <form action="/search" method="get" class="search-form">
-                <input type="text" name="q" placeholder="Search..." class="search-input">
-                <button type="submit" class="search-button">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
-        </div>
-        <div class="right-icons">
-            <a href="shoppingCart" class="icon-link">
-                <i class="fas fa-shopping-cart fa-2x"></i>
-            </a>
-            <a href="login" class="icon-link">
-                <i class="fas fa-user fa-2x"></i>
-            </a>
-        </div>
-    </header>
-    
-    <nav>
-        <form action="/RECOMMENDATIONS" method="post">
-            <button class="nav-button" name="RECOMMENDATIONS">RECOMMENDATIONS</button>
-        </form>
-        <form action="/FOOD" method="post">
-            <button class="nav-button" name="FOOD">FOOD</button>
-        </form>
-        <form action="/TOYS" method="post">
-            <button class="nav-button" name="TOYS">TOYS</button>
-        </form>
-        <form action="/ACCESSORIES" method="post">
-            <button class="nav-button" name="ACCESSORIES">ACCESSORIES</button>
-        </form>
-        <form action="/HEALTH" method="post">
-            <button class="nav-button" name="HEALTH">HEALTH</button>
-        </form>
-        <form action="/DOGS" method="post">
-            <button class="nav-button" name="DOGS">DOGS</button>
-        </form>
-        <form action="/CATS" method="post">
-            <button class="nav-button" name="CATS">CATS</button>
-        </form>
-        <form action="/FISH" method="post">
-            <button class="nav-button" name="FISH">FISH</button>
-        </form>
-        <form action="/ALL" method="post">
-            <button class="nav-button" name="ALL">ALL PETS</button>
-        </form>
-    </nav>
 
-    <body>
-        <div class="product-grid">
-            <% products.forEach(function(products) { %>
-                <div class="products">
-                    <img src="<%= products.ImageURL %>" alt="Product Image">
-                    <div class="product-info">
-                        <h2><%= products.Name %></h2>
-                        <p><%= products.Description %></p>
-                        <p>Price: $<%= products.Price %></p>
-                        <!-- Add any additional product details here -->
-                        <div class="product-buttons">
-                            <form action="/addToCart" method="post"onsubmit="return handleAction(event, 'addtocart')" >
-                                <input type="hidden" name="productID" value="<%= products.ProductID %>">
-                                <button type="submit">Add to Cart</button>
-                            </form>
-                            
-                            <form action="/addToCart" method="post" onsubmit="return handleAction(event, 'buynow')">
-                                <input type="hidden" name="productID" value="<%= products.ProductID %>">
-                                <button type="submit">Buy Now</button>
-                            </form>
-                            <form action="/reviewPage" method="post">
-                                <input type="hidden" name="ProductID" value="<%= products.ProductID %>">
-                                <button type="submit">View Reviews</button>
-                            </form>
-                            <script>
-                                async function handleAction(event, action) {
-                                    event.preventDefault(); // Prevent default form submission
-                                    const form = event.target; // Get the form that was submitted
-                                    const productID = form.querySelector('input[name="productID"]').value;
-                                    try {
-                                        const response = await fetch('/addToCart', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ productID, action }),
-                                        });
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="styles/header.css">
 
-                                        const data = await response.json(); 
-                                        if(data.success){
-                                            if(action === 'addtocart'){
-                                                window.location.href = '/productPage'; // Redirect to productPage
-                                            } else if (action === 'buynow'){
-                                                window.location.href = '/shoppingCart'; // Redirect to shoppingCart
-                                            }
-                                        } else {
-                                            alert('Fail to add to cart ' + data.error);
+<header>
+    <div class="logo">
+        <a href="home" class="icon-link">
+            <!-- <i class="fas fa-home"></i> -->
+            <img src="assets/tinyDog.png">
+        </a>
+    </div>
+    <div class="center-search">
+        <form action="/search" method="get" class="search-form">
+            <input type="text" name="q" placeholder="Search..." class="search-input">
+            <button type="submit" class="search-button">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+    </div>
+    <div class="right-icons">
+        <a href="shoppingCart" class="icon-link">
+            <i class="fas fa-shopping-cart fa-2x"></i>
+        </a>
+        <a href="login" class="icon-link">
+            <i class="fas fa-user fa-2x"></i>
+        </a>
+    </div>
+</header>
+
+<nav>
+    <form action="/RECOMMENDATIONS" method="post">
+        <button class="nav-button" name="RECOMMENDATIONS">RECOMMENDATIONS</button>
+    </form>
+    <form action="/FOOD" method="post">
+        <button class="nav-button" name="FOOD">FOOD</button>
+    </form>
+    <form action="/TOYS" method="post">
+        <button class="nav-button" name="TOYS">TOYS</button>
+    </form>
+    <form action="/ACCESSORIES" method="post">
+        <button class="nav-button" name="ACCESSORIES">ACCESSORIES</button>
+    </form>
+    <form action="/HEALTH" method="post">
+        <button class="nav-button" name="HEALTH">HEALTH</button>
+    </form>
+    <form action="/DOGS" method="post">
+        <button class="nav-button" name="DOGS">DOGS</button>
+    </form>
+    <form action="/CATS" method="post">
+        <button class="nav-button" name="CATS">CATS</button>
+    </form>
+    <form action="/FISH" method="post">
+        <button class="nav-button" name="FISH">FISH</button>
+    </form>
+    <form action="/ALL" method="post">
+        <button class="nav-button" name="ALL">ALL PETS</button>
+    </form>
+</nav>
+
+<body>
+    <div class="product-grid">
+        <% products.forEach(function(products) { %>
+            <div class="products">
+                <img src="<%= products.ImageURL %>" alt="Product Image">
+                <div class="product-info">
+                    <h2>
+                        <%= products.Name %>
+                    </h2>
+                    <p>
+                        <%= products.Description %>
+                    </p>
+                    <p>Price: $<%= products.Price %>
+                    </p>
+                    <!-- Add any additional product details here -->
+                    <div class="product-buttons">
+                        <form action="/addToCart" method="post" onsubmit="return handleAction(event, 'addtocart')">
+                            <input type="hidden" name="productID" value="<%= products.ProductID %>">
+                            <button type="submit">Add to Cart</button>
+                        </form>
+
+                        <form action="/addToCart" method="post" onsubmit="return handleAction(event, 'buynow')">
+                            <input type="hidden" name="productID" value="<%= products.ProductID %>">
+                            <button type="submit">Buy Now</button>
+                        </form>
+                        <form action="/reviewPage" method="post">
+                            <input type="hidden" name="ProductID" value="<%= products.ProductID %>">
+                            <button type="submit">View Reviews</button>
+                        </form>
+                        <script>
+                            async function handleAction(event, action) {
+                                event.preventDefault(); // Prevent default form submission
+                                const form = event.target; // Get the form that was submitted
+                                const productID = form.querySelector('input[name="productID"]').value;
+                                try {
+                                    const response = await fetch('/addToCart', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ productID, action }),
+                                    });
+
+                                    const data = await response.json();
+                                    if (data.success) {
+                                        if (action === 'addtocart') {
+                                            window.location.href = '/productPage'; // Redirect to productPage
+                                        } else if (action === 'buynow') {
+                                            window.location.href = '/shoppingCart'; // Redirect to shoppingCart
                                         }
-                                    } catch (error) {
-                                        alert('Failed to remove product. Please check your stock.'); 
+                                    } else {
+                                        alert('Fail to add to cart ' + data.error);
                                     }
+                                } catch (error) {
+                                    alert('Failed to remove product. Please check your stock.');
                                 }
-                            </script>
-                        </div>
+                            }
+                        </script>
                     </div>
                 </div>
+            </div>
             <% }); %>
-        </div>
-    
-    </body>
+    </div>
+
+</body>
+
 </html>

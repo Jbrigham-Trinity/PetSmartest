@@ -1,8 +1,8 @@
 const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql2');
-const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity, addnewProduct, 
-    productRecommendation, audit, requireLogin, requireAdminLogin, selectProduct, selectRecommendation, getAudit} = require('./db_connect');
+const { Product, createUser, verifyUserAccount, verifyAdminAccount, updateProductQuantity, addnewProduct,
+    productRecommendation, audit, requireLogin, requireAdminLogin, selectProduct, selectRecommendation, getAudit } = require('./db_connect');
 const dotenv = require('dotenv');
 const store = new session.MemoryStore();
 const app = express();
@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs')
 
 app.use(express.static('public'));
-const multer  = require('multer');
+const multer = require('multer');
 const upload = multer();
 
 const pool = mysql.createPool({
@@ -85,7 +85,7 @@ app.get("/productPage", requireLogin, async function (req, res) {
 app.get("/", function (req, res) {
     let name = (typeof req.query.name === 'undefined') ? "World" : req.query.name;
     res.send(`Hello ${name}!`);
-    
+
     res.render('home')
     res.render('productPage')
     res.render('shoppingCart')
@@ -95,7 +95,7 @@ app.get("/", function (req, res) {
     res.render('checkout')
 });
 
-app.get("shopping", function(req, res) {
+app.get("shopping", function (req, res) {
     res.render("productPage.ejs")
 });
 
@@ -129,14 +129,14 @@ app.get("/search", requireLogin, function (req, res) {
 
     pool.getConnection((err, connection) => {
         if (err) throw err;
-        
+
         let sql = `SELECT * FROM Products WHERE Name LIKE ? OR Description LIKE ?;`;
         let query = `%${searchQuery}%`;
-        
+
         connection.query(sql, [query, query], (err, results) => {
             if (err) throw err;
-            
-            res.render('productPage', { products: results});
+
+            res.render('productPage', { products: results });
             connection.release();
         });
     });
@@ -162,61 +162,61 @@ app.post("/updateCart", upload.none(), async (req, res) => {
     pool.getConnection(async (err, connection) => {
         if (err) throw err;
         try {
-            const promises = []; 
+            const promises = [];
             for (let key in formData) {
                 const value = formData[key];
                 const productID = key;
                 const quantity = value;
                 promises.push(
-                selectProduct(productID, connection)
+                    selectProduct(productID, connection)
+                        .then(results => {
+                            if (results.length > 0) {
+                                const product = results[0];
+                                if (!req.session.cart) {
+                                    req.session.cart = [];
+                                }
+                                reformatCart(req, product, quantity);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error updating product:', error);
+                            reject(error);
+                        })
+                );
+            }
+            await Promise.all(promises);
+            connection.release();
+            return res.json({ success: true });
+        } catch (error) {
+            console.error('Error removing product:', error);
+            return res.jason({ success: false })
+        }
+    });
+})
+app.post("/addToCart", async (req, res) => {
+    const { productID, action } = req.body;
+    try {
+        pool.getConnection((err, connection) => {
+            if (err) throw err;
+            selectProduct(productID, connection)
                 .then(results => {
                     if (results.length > 0) {
                         const product = results[0];
                         if (!req.session.cart) {
                             req.session.cart = [];
                         }
-                        reformatCart(req, product, quantity);
+                        reformatCart(req, product, 1);
+                        return res.json({ success: true });
                     }
                 })
                 .catch(error => {
                     console.error('Error updating product:', error);
-                    reject(error);
+                    return res.json({ success: false });
                 })
-                );
-             }
-             await Promise.all(promises);
-             connection.release();
-             return res.json({ success: true });   
-        } catch (error) {
-            console.error('Error removing product:', error);
-            return res.jason({ success: false})
-        }
-    });
-})
-app.post("/addToCart", async (req, res) => {
-    const { productID, action} = req.body;
-    try{
-        pool.getConnection((err, connection) => {
-            if (err) throw err;
-            selectProduct(productID, connection)
-            .then(results => {
-                if (results.length > 0) {
-                    const product = results[0];
-                    if (!req.session.cart) {
-                        req.session.cart = [];
-                    }
-                    reformatCart(req, product, 1);
-                    return res.json({ success: true });   
-                }
-            })
-            .catch(error => {
-                console.error('Error updating product:', error);
-                return res.json({ success: false });   
-            })
-            .finally(() => {
-                connection.release();
-            });
-         });
+                .finally(() => {
+                    connection.release();
+                });
+        });
 
     } catch (error) {
         console.error('Error removing product:', error);
@@ -253,18 +253,18 @@ app.post("/checkout", async (req, res) => {
                 console.log(cartItem.product.ProductID + " " + quantity);
                 await updateProductQuantity(productID, quantity, connection);
                 await productRecommendation(currentUser, productID, connection);
-                await audit("Delete", currentUser, "User", productID, currentUser + " bought " + quantity + " of " + productName,null, connection);
+                await audit("Delete", currentUser, "User", productID, currentUser + " bought " + quantity + " of " + productName, null, connection);
             }))
-            .then(() => {
-                console.log("All bought items updated");
-                res.redirect('/home')
-            })
-            .catch(error => {
-                console.error('Error updating product quantities:', error);
-            })
-            .finally(() => {
-                connection.release();
-            });
+                .then(() => {
+                    console.log("All bought items updated");
+                    res.redirect('/home')
+                })
+                .catch(error => {
+                    console.error('Error updating product quantities:', error);
+                })
+                .finally(() => {
+                    connection.release();
+                });
         });
     } catch (error) {
         console.error('Error during checkout:', error);
@@ -273,34 +273,34 @@ app.post("/checkout", async (req, res) => {
 
 });
 app.get("/reviewPage", requireLogin, function (req, res) {
-    res.render('reviewPage' )
+    res.render('reviewPage')
 });
 
 app.post("/reviewPage", async (req, res) => {
-        const productId = req.body.ProductID;
-        
-        pool.getConnection(async (err, connection) => {
+    const productId = req.body.ProductID;
+
+    pool.getConnection(async (err, connection) => {
+        if (err) throw err;
+
+        let sql = 'SELECT * FROM customer_reviews WHERE ProductID = ?;';
+
+        connection.query(sql, [productId], (err, results) => {
             if (err) throw err;
 
-            let sql = 'SELECT * FROM customer_reviews WHERE ProductID = ?;';
-
-            connection.query(sql, [productId], (err, results) => {
-                if (err) throw err;
-
-                console.log(results);
-                res.render('reviewPage', { reviews: results });
-                connection.release();
-            });
+            console.log(results);
+            res.render('reviewPage', { reviews: results });
+            connection.release();
         });
     });
+});
 
 
-app.get("/home", function (req, res){
+app.get("/home", function (req, res) {
     res.render('home.ejs')
 });
 
-app.get("/login", function (req, res){
-    res.render('login.ejs', { user : req.session.user })
+app.get("/login", function (req, res) {
+    res.render('login.ejs', { user: req.session.user })
 
 })
 app.post('/login', async (req, res) => {
@@ -316,12 +316,12 @@ app.post('/login', async (req, res) => {
                     if (user) {
                         req.session.user = user;  // Set user info in session
                         req.session.isLoggedIn = true; // Set the login flag
-                        return res.json({ success: true });   
-                    } 
+                        return res.json({ success: true });
+                    }
                 })
                 .catch(error => {
                     console.error('Error verifying user account:', error);
-                    return res.json({ success: false });   
+                    return res.json({ success: false });
                 })
                 .finally(() => {
                     connection.release();
@@ -333,7 +333,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get("/adminLogin", function (req, res){
+app.get("/adminLogin", function (req, res) {
     res.render('adminLogin.ejs')
 
 })
@@ -349,8 +349,8 @@ app.post('/adminLogin', async (req, res) => {
                 .then(admin => {
                     if (admin) {
                         console.log(admin);
-                        req.session.admin = admin;  
-                        req.session.isAdminLoggedIn = true; 
+                        req.session.admin = admin;
+                        req.session.isAdminLoggedIn = true;
                         res.redirect('/adminPage');  // Redirect to the admin page
                     } else {
                         res.status(401).send('Invalid username or password');
@@ -370,10 +370,10 @@ app.post('/adminLogin', async (req, res) => {
     }
 });
 
-app.post('/RECOMMENDATIONS', function (req, res){
+app.post('/RECOMMENDATIONS', function (req, res) {
     try {
         pool.getConnection(async (err, connection) => {
-            if(err){
+            if (err) {
                 throw err;
             }
             const currentUser = req.session.user[0].Custusername;
@@ -400,7 +400,7 @@ app.post('/RECOMMENDATIONS', function (req, res){
                 res.render('productPage', { products: [] });
             }
             connection.release();
-    });
+        });
     } catch (error) {
         console.error("Error:", error);
         res.status(500).send("Internal Server Error");
@@ -410,7 +410,7 @@ app.post('/RECOMMENDATIONS', function (req, res){
 
 
 
-app.post('/FOOD', function (req, res){
+app.post('/FOOD', function (req, res) {
     const category = "food";
 
     if (!category) {
@@ -420,19 +420,19 @@ app.post('/FOOD', function (req, res){
 
     pool.getConnection((err, connection) => {
         if (err) throw err;
-        
+
         let sql = `SELECT * FROM Products WHERE Category = ?;`;
-        
+
         connection.query(sql, [category], (err, results) => {
             if (err) throw err;
-            
+
             res.render('productPage', { products: results });
             connection.release();
         });
     });
-}) 
+})
 
-app.post('/TOYS', function (req, res){
+app.post('/TOYS', function (req, res) {
     const category = "toys";
 
     if (!category) {
@@ -442,19 +442,19 @@ app.post('/TOYS', function (req, res){
 
     pool.getConnection((err, connection) => {
         if (err) throw err;
-        
+
         let sql = `SELECT * FROM Products WHERE Category = ?;`;
-        
+
         connection.query(sql, [category], (err, results) => {
             if (err) throw err;
-            
+
             res.render('productPage', { products: results });
             connection.release();
         });
     });
-}) 
+})
 
-app.post('/ACCESSORIES', function (req, res){
+app.post('/ACCESSORIES', function (req, res) {
     const category = "accessories";
 
     if (!category) {
@@ -464,19 +464,19 @@ app.post('/ACCESSORIES', function (req, res){
 
     pool.getConnection((err, connection) => {
         if (err) throw err;
-        
+
         let sql = `SELECT * FROM Products WHERE Category = ?;`;
-        
+
         connection.query(sql, [category], (err, results) => {
             if (err) throw err;
-            
+
             res.render('productPage', { products: results });
             connection.release();
         });
     });
-}) 
+})
 
-app.post('/HEALTH', function (req, res){
+app.post('/HEALTH', function (req, res) {
     const category = "health";
 
     if (!category) {
@@ -486,19 +486,19 @@ app.post('/HEALTH', function (req, res){
 
     pool.getConnection((err, connection) => {
         if (err) throw err;
-        
+
         let sql = `SELECT * FROM Products WHERE Category = ?;`;
-        
+
         connection.query(sql, [category], (err, results) => {
             if (err) throw err;
-            
+
             res.render('productPage', { products: results });
             connection.release();
         });
     });
-}) 
+})
 
-app.post('/DOGS', function (req, res){
+app.post('/DOGS', function (req, res) {
     const category = "dog";
 
     if (!category) {
@@ -508,19 +508,19 @@ app.post('/DOGS', function (req, res){
 
     pool.getConnection((err, connection) => {
         if (err) throw err;
-        
+
         let sql = `SELECT * FROM Products WHERE AnimalType = ?;`;
-        
+
         connection.query(sql, [category], (err, results) => {
             if (err) throw err;
-            
+
             res.render('productPage', { products: results });
             connection.release();
         });
     });
-}) 
+})
 
-app.post('/CATS', function (req, res){
+app.post('/CATS', function (req, res) {
     const category = "cat";
 
     if (!category) {
@@ -530,19 +530,19 @@ app.post('/CATS', function (req, res){
 
     pool.getConnection((err, connection) => {
         if (err) throw err;
-        
+
         let sql = `SELECT * FROM Products WHERE AnimalType = ?;`;
-        
+
         connection.query(sql, [category], (err, results) => {
             if (err) throw err;
-            
+
             res.render('productPage', { products: results });
             connection.release();
         });
     });
-}) 
+})
 
-app.post('/FISH', function (req, res){
+app.post('/FISH', function (req, res) {
     const category = "fish";
     const all = "All Pets"
 
@@ -553,18 +553,18 @@ app.post('/FISH', function (req, res){
 
     pool.getConnection((err, connection) => {
         if (err) throw err;
-        
+
         let sql = `SELECT * FROM Products WHERE AnimalType = ?;`;
-        
+
         connection.query(sql, [category || all], (err, results) => {
             if (err) throw err;
-            
+
             res.render('productPage', { products: results });
             connection.release();
         });
     });
-}) 
-app.post('/ALL', function (req, res){
+})
+app.post('/ALL', function (req, res) {
     const category = "All Pets"
 
     if (!category) {
@@ -574,20 +574,20 @@ app.post('/ALL', function (req, res){
 
     pool.getConnection((err, connection) => {
         if (err) throw err;
-        
+
         let sql = `SELECT * FROM Products WHERE AnimalType = ?;`;
-        
+
         connection.query(sql, [category || all], (err, results) => {
             if (err) throw err;
-            
+
             res.render('productPage', { products: results });
             connection.release();
         });
     });
-}) 
+})
 
 
-app.get("/makeAccount", function (req, res){
+app.get("/makeAccount", function (req, res) {
     res.render('makeAccount.ejs')
 })
 app.post('/makeAccount', async (req, res) => {
@@ -596,7 +596,7 @@ app.post('/makeAccount', async (req, res) => {
     if (password === '' | username === '' | email === '') {
         return res.status(400).send('Please fill in all information');
     }
-    if (password !== confirmPassword){
+    if (password !== confirmPassword) {
         return res.status(400).send('Password and Confirm Password do not match');
     }
     try {
@@ -607,24 +607,24 @@ app.post('/makeAccount', async (req, res) => {
             }
             console.log(`MySQL Connected to create user account`);
             createUser(username, password, email, connection)
-            .then(results => {
-                if (results) {
-                    res.redirect('/login');
-                }
-            })
-            .catch(error => {
-                console.error('Error creating account:', error);
-                res.status(401).send('Error creating account');
-            })
-            .finally(() => {
-                connection.release();
-            });
-         });
+                .then(results => {
+                    if (results) {
+                        res.redirect('/login');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error creating account:', error);
+                    res.status(401).send('Error creating account');
+                })
+                .finally(() => {
+                    connection.release();
+                });
+        });
 
 
     } catch (error) {
         console.error('Error creating user:', error);
-        res.status(500).send('Error creating user');   
+        res.status(500).send('Error creating user');
     }
 })
 app.get("/adminPage", requireAdminLogin, function (req, res) {
@@ -633,21 +633,21 @@ app.get("/adminPage", requireAdminLogin, function (req, res) {
 app.get("/adminAddProducts", requireAdminLogin, function (req, res) {
     res.render("adminAddProducts.ejs")
 })
-app.post('/adminAdd', async(req,res) => {
-    const {name, category, description, price, quantity, brand, animal, imageurl} = req.body;
+app.post('/adminAdd', async (req, res) => {
+    const { name, category, description, price, quantity, brand, animal, imageurl } = req.body;
     const adminusername = req.session.admin[0].AdminUserName;
     try {
         pool.getConnection(async (err, connection) => {
-            if(err){
+            if (err) {
                 throw err;
             }
-        const productID = await addnewProduct(name, category, description, price, quantity, brand, animal, imageurl, connection);
-        console.log(productID); 
-        await audit("Add", null, "Admin", productID, 
-                         `Admin created a new product named ${name} with ${quantity} in stock`, adminusername,
-                         connection);
-        connection.release(); 
-        res.json({ success: true }); 
+            const productID = await addnewProduct(name, category, description, price, quantity, brand, animal, imageurl, connection);
+            console.log(productID);
+            await audit("Add", null, "Admin", productID,
+                `Admin created a new product named ${name} with ${quantity} in stock`, adminusername,
+                connection);
+            connection.release();
+            res.json({ success: true });
         })
     } catch (error) {
         console.error('Error adding product or updating audit trail:', error);
@@ -681,7 +681,7 @@ app.get("/adminSubProducts", requireAdminLogin, function (req, res) {
         res.status(500).send('Internal Server err');
     }
 });
-app.post('/adminUpdate', async(req,res) =>{
+app.post('/adminUpdate', async (req, res) => {
     const { productName, quantity, productID, action } = req.body;
     const adminusername = req.session.admin[0].AdminUserName;
 
@@ -692,14 +692,14 @@ app.post('/adminUpdate', async(req,res) =>{
                 console.error('Error connecting to database:', err);
                 return;
             }
-            if(action === 'add'){
+            if (action === 'add') {
                 adjustedQuantity = -quantity;
             }
 
             await updateProductQuantity(productID, adjustedQuantity, connection);
-            await audit("Edit", null, "Admin", productID, 
-                         `Admin ${action} ${quantity} ${productName}  ${quantity} from stock`, adminusername,
-                         connection);
+            await audit("Edit", null, "Admin", productID,
+                `Admin ${action} ${quantity} ${productName}  ${quantity} from stock`, adminusername,
+                connection);
             connection.release();
             return res.json({ success: true });
         });
@@ -721,7 +721,7 @@ app.get("/auditTrail", requireAdminLogin, async function (req, res) {
                 .finally(() => {
                     connection.release();
 
-            });
+                });
         })
     } catch (error) {
         console.error('Error fetching audit:', error);

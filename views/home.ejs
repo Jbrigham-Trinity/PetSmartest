@@ -1,33 +1,50 @@
-
 <!DOCTYPE html>
 <html>
+
 <head>
-<style>
-    body {
-        background-image: linear-gradient(to right, #04cef1 50%, #1b86f9 100%);
-    }
-    h1 {
-        z-index: 1;
-        font-size: xx-large;
-    }
-    button {
-        text-align: center;
-    }
-    img {
-        z-index: 0;
-    }
-button {
-    background-color: aliceblue;
-    border-radius: 5px;
-}
-.wireframe-button {
+    <style>
+        body {
+            background-image: linear-gradient(to right, #04cef1 50%, #1b86f9 100%);
+        }
+
+        h1 {
+            z-index: 1;
+            font-size: 100px;
+            font-family: Lucida Handwriting, cursive;
+            position: relative;
+            /* Change the font family here */
+            color: white;
+            /* Change the font color to white */
+        }
+
+        button {
+            text-align: center;
+            color: white;
+        }
+
+        img {
+            position: relative;
+            /* Add position: relative; */
+            z-index: 0;
+            margin-top: -50px;
+            /* Adjust this value as needed to position the image */
+        }
+
+        button {
+            background-color: aliceblue;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .wireframe-button {
             display: inline-block;
             padding: 10px 20px;
             border: 2px solid white;
             background-color: rgba(255, 255, 255, 0.198);
             text-align: center;
             text-decoration: none;
-            font-size: 16px;
+            font-size: 35px;
+            color: white;
             font-family: Arial, sans-serif;
             cursor: pointer;
             transition: background-color 0.3s, color 0.3s;
@@ -35,21 +52,25 @@ button {
 
         .wireframe-button:hover {
             background-color: white;
-            color: #333; /* Change the color on hover as needed */
+            color: #333;
+            /* Change the color on hover as needed */
         }
-</style>
+    </style>
 </head>
+
 <body>
 
-<div style="text-align: center;">
+    <div style="text-align: center;">
 
-    <h1>BLUEDOG SHOPPING</h1>
-    <img style="align-self: center" src="assets/doggert.png" width="400" height="400">
+        <h1>Bluedog Shopping</h1>
+        <img style="align-self: center" src="assets/doggert.png" width="400" height="400">
     </div>
+
     <div style="text-align: center">
-    <a href="login">
-    <button class="wireframe-button"> Click me </button>
-    </a>
-    <div>
+        <a href="login">
+            <button class="wireframe-button"> Shop Now </button>
+        </a>
+        <div>
 </body>
+
 </html>
