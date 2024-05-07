@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles/header.css">
     <link rel="stylesheet" href="styles/styles.css"> <!-- Link to the separate CSS file -->
 
 </head>
+
 <body>
     <header>
         <div class="logo">
@@ -36,29 +38,32 @@
             </div>
             <div class="form-group">
                 <label for="description">Description:</label>
-                <input type="text" id="description" name="description" placeholder="Enter Product Description" class="description">
+                <input type="text" id="description" name="description" placeholder="Enter Product Description"
+                    class="description">
             </div>
             <div class="form-group">
                 <label for="price">Price:</label>
                 <input type="number" id="price" step="0.01" name="price" placeholder="Enter Price" class="price">
-            </div>
-            <div class="form-group">
-                <label for="quantity">Quantity:</label>
-                <input type="number" id="quantity" name="quantity" placeholder="Enter Quantity" class="quantity">
-            </div>
-            <div class="form-group">
-                <label for="brand">Brand:</label>
-                <input type="text" id="brand" name="brand" placeholder="Enter Product Brand" class="brand">
-            </div>
-            <div class="form-group">
-                <label for="animal">Target Animal:</label>
-                <input type="text" id="animal" name="animal" placeholder="Enter Product's Target Animal" class="animal">
-            </div>
-            <div class="form-group">
-                <label for="imageurl">Image URL:</label>
-                <input type="text" id="imageurl" name="imageurl" placeholder="Enter Product's Image URL" class="image">
-            </div>
-            <button type="submit">Submit</button>
+                <div class="form-group">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" placeholder="Enter Quantity"
+                        class="quantity">
+                </div>
+                <div class="form-group">
+                    <label for="brand">Brand:</label>
+                    <input type="text" id="brand" name="brand" placeholder="Enter Product Brand" class="brand">
+                </div>
+                <div class="form-group">
+                    <label for="animal">Target Animal:</label>
+                    <input type="text" id="animal" name="animal" placeholder="Enter Product's Target Animal"
+                        class="animal">
+                </div>
+                <div class="form-group">
+                    <label for="imageurl">Image URL:</label>
+                    <input type="text" id="imageurl" name="imageurl" placeholder="Enter Product's Image URL"
+                        class="image">
+                </div>
+                <button type="submit">Submit</button>
         </form>
         <script>
             async function handleSubmit(event) {
@@ -71,7 +76,7 @@
                 const brand = document.querySelector('.brand').value;
                 const animal = document.querySelector('.animal').value;
                 const imageurl = document.querySelector('.image').value;
-                
+
                 try {
                     const response = await fetch('/adminAdd', {
                         method: 'POST',
@@ -80,17 +85,18 @@
                     });
 
                     const data = await response.json();
-                    if(data.success){
+                    if (data.success) {
                         alert('Successfully added product');
                         window.location.href = '/adminAddProducts'; // Redirect on success
                     } else {
                         alert('Failed to add product ' + data.error);
                     }
                 } catch (error) {
-                    alert('Failed to add product. '); 
+                    alert('Failed to add product. ');
                 }
             }
         </script>
     </div>
 </body>
+
 </html>
